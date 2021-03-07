@@ -40,6 +40,7 @@ type ImgLoaderOptions = {
 	cacheDir: string;
 	context?: string;
 	optionHashLength: number;
+	generateDeclarations: boolean;
 	qualityLevels: Record<string, ImgLoaderQualityOptions>;
 	defaultQualityLevel: string;
 	modes: Record<string, ModeOptions>;

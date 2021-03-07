@@ -5,6 +5,7 @@ const defaultOptions: ImgLoaderOptions = {
 	outputPath: '',
 	cacheDir: '.img-loader-cache',
 	optionHashLength: 4,
+	generateDeclarations: false,
 	thumbnail: {
 		width: 4,
 		height: 4,

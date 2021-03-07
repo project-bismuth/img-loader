@@ -13,6 +13,7 @@ import makePowerOfTwo from './lib/makePowerOfTwo';
 import createWebpFile from './lib/createWebpFile';
 import createJpegFile from './lib/createJpegFile';
 import createPngFile from './lib/createPngFile';
+import generateDeclarations from './lib/generateDeclarations';
 import getDefaultQuality from './lib/getDefaultQuality';
 
 
@@ -39,6 +40,11 @@ export default async function load( source: string ): Promise<string> {
 		: interpolatedName;
 
 	const relativePath = this.resourcePath.replace( this.rootContext, '' );
+
+
+	if ( options.generateDeclarations && process.env.NODE_ENV !== 'production' ) {
+		generateDeclarations( options );
+	}
 
 
 	let mode = 'default';
