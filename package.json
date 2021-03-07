@@ -1,0 +1,68 @@
+{
+	"name": "@resn/bismuth-img-loader",
+	"version": "1.0.0",
+	"description": "Magical image loading.",
+	"main": "dist/cjs/bismuth-img-loader.js",
+	"module": "dist/esm/bismuth-img-loader.js",
+	"repository": "",
+	"author": "johh <johannes@resn.co.nz>",
+	"license": "BSD-4-Clause",
+	"private": false,
+	"sideEffects": false,
+	"keywords": [],
+	"scripts": {
+		"build": "rollup -c",
+		"declaration": "tsc --emitDeclarationOnly",
+		"type-check": "tsc --noEmit",
+		"dev": "rollup -c -w",
+		"lint": "eslint --ext .ts,.tsx,.js src/"
+	},
+	"devDependencies": {
+		"@babel/cli": "^7.10.5",
+		"@babel/core": "^7.10.5",
+		"@babel/eslint-parser": "^7.13.8",
+		"@babel/plugin-proposal-class-properties": "^7.10.4",
+		"@babel/plugin-proposal-object-rest-spread": "^7.10.4",
+		"@babel/preset-env": "^7.10.4",
+		"@babel/preset-typescript": "^7.10.4",
+		"@types/loader-utils": "^2.0.1",
+		"@types/object-hash": "^1.3.4",
+		"@types/sharp": "^0.27.1",
+		"@typescript-eslint/eslint-plugin": "^4.7.0",
+		"@typescript-eslint/parser": "^4.7.0",
+		"eslint": "^7.21.0",
+		"eslint-config-airbnb-typescript": "^12.0.0",
+		"eslint-plugin-import": "^2.22.1",
+		"eslint-plugin-jsx-a11y": "^6.4.1",
+		"eslint-plugin-react": "^7.20.0",
+		"eslint-plugin-react-hooks": "^4.2.0",
+		"husky": "^4.2.5",
+		"lint-staged": "^10.2.11",
+		"rollup": "^2.22.2",
+		"rollup-plugin-terser": "^7.0.2",
+		"rollup-plugin-typescript2": "^0.27.1",
+		"ts-transformer-properties-rename": "^0.9.0",
+		"tslib": "^2.0.0",
+		"typescript": "^4.0.5",
+		"webpack": "^5.24.3"
+	},
+	"dependencies": {
+		"@types/imagemin-mozjpeg": "^8.0.0",
+		"imagemin": "^7.0.1",
+		"imagemin-mozjpeg": "^9.0.0",
+		"imagemin-pngquant": "^9.0.1",
+		"loader-utils": "^2.0.0",
+		"object-hash": "^2.1.1",
+		"ora": "^5.3.0",
+		"sharp": "^0.27.2"
+	},
+	"peerDependencies": {},
+	"husky": {
+		"hooks": {
+			"pre-commit": "lint-staged"
+		}
+	},
+	"lint-staged": {
+		"*.{ts,tsx,js}": "eslint --max-warnings 1"
+	}
+}

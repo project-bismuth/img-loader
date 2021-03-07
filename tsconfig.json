@@ -1,0 +1,26 @@
+{
+	"compilerOptions": {
+		"outDir": "./dist/",
+		"sourceMap": true,
+		"declaration": true,
+		"declarationDir": "./dist/",
+		"noImplicitAny": true,
+		"module": "es6",
+		"moduleResolution": "node",
+		"target": "es6",
+		"jsx": "react",
+		"esModuleInterop": false,
+		"allowSyntheticDefaultImports": true,
+		"removeComments": true,
+		"lib": [
+			"ES2017",
+			"dom",
+			"webworker",
+		],
+		"plugins": []
+	},
+	"include": [
+		"./src/**/*",
+		"./*.config.js",
+	]
+}
