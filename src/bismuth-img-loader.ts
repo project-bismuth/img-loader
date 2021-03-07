@@ -13,6 +13,7 @@ import makePowerOfTwo from './lib/makePowerOfTwo';
 import createWebpFile from './lib/createWebpFile';
 import createJpegFile from './lib/createJpegFile';
 import createPngFile from './lib/createPngFile';
+import getDefaultQuality from './lib/getDefaultQuality';
 
 
 interface QueryParams {
@@ -57,13 +58,7 @@ export default async function load( source: string ): Promise<string> {
 	}
 
 
-	let quality;
-
-	if ( mode !== 'default' && 'defaultQualityLevel' in options.modes[mode]) {
-		quality = options.modes[mode].defaultQualityLevel;
-	} else {
-		quality = options.defaultQualityLevel;
-	}
+	let quality = getDefaultQuality( options, mode );
 
 	if ( params.quality ) {
 		if ( params.quality in options.qualityLevels ) {
