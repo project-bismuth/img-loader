@@ -89,12 +89,14 @@ export default async function makePowerOfTwo({
 		path: string;
 	}> {
 	const size = getPowerOfTwoSize( width, height, strategy );
-
-	const cached = await getFile({
+	const cacheOpts = {
 		inputHash,
 		options: size,
 		cacheDir,
-	});
+		ext: '.png',
+	};
+
+	const cached = await getFile( cacheOpts );
 
 	if ( cached ) return cached;
 
@@ -107,9 +109,7 @@ export default async function makePowerOfTwo({
 		buffer,
 		path: await writeFile({
 			buffer,
-			inputHash,
-			options: size,
-			cacheDir,
+			...cacheOpts,
 		}),
 	};
 }

@@ -9,14 +9,16 @@ interface ChacheProps {
 	inputHash: string;
 	options: unknown;
 	cacheDir: string;
+	ext?: string;
 }
 
 export function getFilename({
 	inputHash,
 	options,
 	cacheDir,
+	ext = '',
 }: ChacheProps ): string {
-	return path.resolve( cacheDir, `${inputHash}-${objHash( options )}` );
+	return path.resolve( cacheDir, `${inputHash}-${objHash( options )}${ext}` );
 }
 
 
