@@ -178,7 +178,8 @@ export default async function load( source: string ): Promise<string> {
 		exportFiles.push({ ext: fileExt, name: 'src' });
 	}
 
-	const exportMeta: { name: string; value: string }[] = [];
+
+	const exportMeta: { name: string; value: string | number }[] = [];
 
 	if ( exportOptions.thumbnail ) {
 		const thumb = await sharp( sourceFileBuffer ).resize(
@@ -199,6 +200,11 @@ export default async function load( source: string ): Promise<string> {
 			}),
 		});
 	}
+
+	exportMeta.push(
+		{ name: 'width', value: sourceFileStats.width },
+		{ name: 'height', value: sourceFileStats.height },
+	);
 
 
 	return `

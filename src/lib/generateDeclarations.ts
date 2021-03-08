@@ -14,6 +14,8 @@ const base = `
 type _BismuthImage = {
 	src: string;
 	prefix: string;
+	width: number;
+	height: number;
 };
 
 type _WithWebp = {
