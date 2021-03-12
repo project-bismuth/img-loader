@@ -100,8 +100,8 @@ const defaultOptions: ImgLoaderOptions = {
 				mipmaps: true,
 				mipFilter: 'lanczos3',
 				linear: true,
-				uastcLevel: 2,
-				uastcRdoQ: 3,
+				uastcLevel: 3,
+				uastcRdoQ: 1,
 				yFlip: false,
 				normalMap: false,
 				separateRgToColorAlpha: false,
@@ -132,7 +132,17 @@ const defaultOptions: ImgLoaderOptions = {
 			emitBasis: true,
 			defaultQualityLevel: 'high',
 			qualityLevels: {
+				low: {
+					basis: {
+						normalMap: true,
+						separateRgToColorAlpha: true,
+					},
+				},
 				medium: {
+					basis: {
+						normalMap: true,
+						separateRgToColorAlpha: true,
+					},
 					pngquant: {
 						quality: [.85, 1],
 					},
