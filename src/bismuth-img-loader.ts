@@ -136,6 +136,7 @@ export default async function load( source: string ): Promise<string> {
 			inputPath,
 			options: exportOptions.basis,
 			cacheDir,
+			reportName: relativePath,
 		});
 
 		this.emitFile( `${fileName}.basis`, basis.buffer );

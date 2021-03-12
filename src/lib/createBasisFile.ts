@@ -28,6 +28,7 @@ interface CreateBasisFileProps {
 	options: BasisOptions;
 	inputHash: string;
 	cacheDir: string;
+	reportName: string;
 }
 
 export default async function createBasisFile({
@@ -35,6 +36,7 @@ export default async function createBasisFile({
 	options,
 	inputHash,
 	cacheDir,
+	reportName,
 }: CreateBasisFileProps ): Promise<{
 		buffer: Buffer;
 		path: string;
@@ -102,7 +104,7 @@ export default async function createBasisFile({
 		}
 	}
 
-	const spinner = ora( `compressing ${inputPath}` );
+	const spinner = ora( `compressing ${reportName}` );
 	spinner.spinner = 'triangle';
 	spinner.start();
 
