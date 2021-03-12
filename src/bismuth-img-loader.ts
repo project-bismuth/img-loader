@@ -22,6 +22,8 @@ interface QueryParams {
 	quality?: string;
 }
 
+let generatedDeclarations = false;
+
 export default async function load( source: string ): Promise<string> {
 	if ( this.cacheable ) this.cacheable();
 
@@ -42,8 +44,13 @@ export default async function load( source: string ): Promise<string> {
 	const relativePath = this.resourcePath.replace( this.rootContext, '' );
 
 
-	if ( options.generateDeclarations && process.env.NODE_ENV !== 'production' ) {
+	if (
+		!generatedDeclarations
+		&& options.generateDeclarations
+		&& process.env.NODE_ENV !== 'production'
+	) {
 		generateDeclarations( options );
+		generatedDeclarations = true;
 	}
 
 
