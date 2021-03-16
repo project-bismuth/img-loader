@@ -32,14 +32,6 @@ export default async function load( source: string ): Promise<string> {
 	const params = this.resourceQuery
 		? loaderUtils.parseQuery( this.resourceQuery ) as QueryParams
 		: {};
-	const interpolatedName = loaderUtils.interpolateName( this, options.name, {
-		context,
-		content: source,
-	});
-
-	const outputPath = ( 'outputPath' in options )
-		? path.join( options.outputPath, interpolatedName )
-		: interpolatedName;
 
 	const relativePath = this.resourcePath.replace( this.rootContext, '' );
 
@@ -87,6 +79,15 @@ export default async function load( source: string ): Promise<string> {
 		mode,
 		quality,
 	});
+
+
+	const interpolatedName = loaderUtils.interpolateName( this, options.name, {
+		context,
+		content: source,
+	});
+	const outputPath = ( 'outputPath' in options )
+		? path.join( options.outputPath, interpolatedName )
+		: interpolatedName;
 
 
 	const temp = outputPath.split( '.' );
@@ -155,7 +156,12 @@ export default async function load( source: string ): Promise<string> {
 		exportFiles.push({ ext: 'webp', name: 'webp' });
 	}
 
-	if ( fileExt === 'jpg' || fileExt === 'jpeg' ) {
+	if ( options.skipCompression ) {
+		this.emitWarning(
+			'opts.skipCompression is enabled, skipping...',
+		);
+		exportFiles.push({ ext: fileExt, name: 'src' });
+	} else if ( fileExt === 'jpg' || fileExt === 'jpeg' ) {
 		const jpg = await createJpegFile({
 			inputHash,
 			buffer: inputBuffer,

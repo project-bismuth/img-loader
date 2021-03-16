@@ -23,6 +23,7 @@ interface ImgLoaderExportOptions {
 	};
 	emitWebp: boolean;
 	emitBasis: boolean;
+	skipCompression: boolean;
 	forcePowerOfTwo: boolean;
 	powerOfTwoStrategy: 'upscale' | 'downscale' | 'nearest' | 'area';
 }

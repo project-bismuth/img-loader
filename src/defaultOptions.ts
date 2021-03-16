@@ -12,6 +12,7 @@ const defaultOptions: ImgLoaderOptions = {
 	},
 	emitWebp: true,
 	emitBasis: false,
+	skipCompression: false,
 	forcePowerOfTwo: false,
 	powerOfTwoStrategy: 'area',
 	defaultQualityLevel: 'medium',
