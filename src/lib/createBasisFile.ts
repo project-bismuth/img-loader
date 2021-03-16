@@ -1,5 +1,5 @@
 import path from 'path';
-import fs from 'fs/promises';
+import { promises as fs } from 'fs';
 import { promisify } from 'util';
 import { exec } from 'child_process';
 import ora from 'ora';

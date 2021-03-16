@@ -1,7 +1,7 @@
 import loaderUtils from 'loader-utils';
 import sharp from 'sharp';
 import path from 'path';
-import fs from 'fs/promises';
+import { promises as fs } from 'fs';
 import objHash from 'object-hash';
 
 import defaultOptions from './defaultOptions';
