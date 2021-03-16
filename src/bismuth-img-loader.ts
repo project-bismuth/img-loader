@@ -160,6 +160,8 @@ export default async function load( source: string ): Promise<string> {
 		this.emitWarning(
 			'opts.skipCompression is enabled, skipping...',
 		);
+
+		this.emitFile( `${fileName}.${fileExt}`, inputBuffer );
 		exportFiles.push({ ext: fileExt, name: 'src' });
 	} else if ( fileExt === 'jpg' || fileExt === 'jpeg' ) {
 		const jpg = await createJpegFile({
