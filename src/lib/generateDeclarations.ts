@@ -16,6 +16,7 @@ type _BismuthImage = {
 	prefix: string;
 	width: number;
 	height: number;
+	alpha: boolean;
 };
 
 type _WithWebp = {

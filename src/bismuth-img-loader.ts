@@ -187,7 +187,7 @@ export default async function load( source: string ): Promise<string> {
 	}
 
 
-	const exportMeta: { name: string; value: string | number }[] = [];
+	const exportMeta: { name: string; value: string | number | boolean }[] = [];
 
 	if ( exportOptions.thumbnail ) {
 		const thumb = await sharp( sourceFileBuffer ).resize(
@@ -212,6 +212,7 @@ export default async function load( source: string ): Promise<string> {
 	exportMeta.push(
 		{ name: 'width', value: sourceFileStats.width },
 		{ name: 'height', value: sourceFileStats.height },
+		{ name: 'alpha', value: sourceFileStats.hasAlpha },
 	);
 
 
