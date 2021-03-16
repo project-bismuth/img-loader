@@ -1,5 +1,5 @@
 {
-	"name": "@resn/bismuth-img-loader",
+	"name": "@bismuth/img-loader",
 	"version": "1.0.0",
 	"description": "Magical image loading.",
 	"main": "dist/cjs/bismuth-img-loader.js",
