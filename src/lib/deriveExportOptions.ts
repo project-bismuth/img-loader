@@ -104,6 +104,7 @@ export default function deriveExportOptions({
 			emitWebp: options.emitWebp,
 			forcePowerOfTwo: options.forcePowerOfTwo,
 			powerOfTwoStrategy: options.powerOfTwoStrategy,
+			skipCompression: options.skipCompression,
 		};
 	}
 
@@ -118,5 +119,8 @@ export default function deriveExportOptions({
 			options.forcePowerOfTwo, modeOptions.forcePowerOfTwo,
 		),
 		powerOfTwoStrategy: modeOptions.powerOfTwoStrategy || options.powerOfTwoStrategy,
+		skipCompression: mergeBooleanOptions(
+			options.skipCompression, modeOptions.skipCompression,
+		),
 	};
 }

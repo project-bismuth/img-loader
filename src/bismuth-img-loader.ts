@@ -156,7 +156,7 @@ export default async function load( source: string ): Promise<string> {
 		exportFiles.push({ ext: 'webp', name: 'webp' });
 	}
 
-	if ( options.skipCompression ) {
+	if ( exportOptions.skipCompression ) {
 		this.emitWarning(
 			'opts.skipCompression is enabled, skipping...',
 		);
