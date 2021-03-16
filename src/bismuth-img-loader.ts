@@ -198,19 +198,20 @@ export default async function load( source: string ): Promise<string> {
 	const exportMeta: { name: string; value: string | number | boolean }[] = [];
 
 	if ( exportOptions.thumbnail ) {
-		const thumb = await sharp( sourceFileBuffer ).resize(
+		const thumb = sharp( sourceFileBuffer ).resize(
 			exportOptions.thumbnail.width,
 			exportOptions.thumbnail.height,
 			{ fit: 'fill' },
-		)
-			.raw()
-			.ensureAlpha()
-			.toBuffer();
+		);
 
 		exportMeta.push({
 			name: 'thumbnail',
 			value: JSON.stringify({
-				data: thumb.toString( 'base64' ),
+				data: ( await (
+					exportOptions.thumbnail.format === 'png'
+						? thumb.png().toBuffer()
+						: thumb.ensureAlpha().raw().toBuffer()
+				) ).toString( 'base64' ),
 				width: exportOptions.thumbnail.width,
 				height: exportOptions.thumbnail.height,
 			}),

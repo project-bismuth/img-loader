@@ -20,6 +20,7 @@ interface ImgLoaderExportOptions {
 	thumbnail: false | {
 		width: number;
 		height: number;
+		format: 'raw' | 'png';
 	};
 	emitWebp: boolean;
 	emitBasis: boolean;

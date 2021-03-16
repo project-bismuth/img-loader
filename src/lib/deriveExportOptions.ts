@@ -36,7 +36,7 @@ function mergeThumbnailOptions(
 		return baseOption;
 	}
 
-	if ( 'width' in overrideOption && 'height' in overrideOption ) {
+	if ( 'width' in overrideOption && 'height' in overrideOption && 'format' in overrideOption ) {
 		return overrideOption as ThumbnailMeta;
 	}
 

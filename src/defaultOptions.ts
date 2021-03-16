@@ -9,6 +9,7 @@ const defaultOptions: ImgLoaderOptions = {
 	thumbnail: {
 		width: 4,
 		height: 4,
+		format: 'raw',
 	},
 	emitWebp: true,
 	emitBasis: false,
