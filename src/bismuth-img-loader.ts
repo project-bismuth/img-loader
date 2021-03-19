@@ -207,11 +207,11 @@ export default async function load( source: string ): Promise<string> {
 		exportMeta.push({
 			name: 'thumbnail',
 			value: JSON.stringify({
-				data: ( await (
-					exportOptions.thumbnail.format === 'png'
-						? thumb.png().toBuffer()
-						: thumb.ensureAlpha().raw().toBuffer()
-				) ).toString( 'base64' ),
+				data: exportOptions.thumbnail.format === 'png'
+					? `data:image/png;base64,${
+						( await thumb.png().toBuffer() ).toString( 'base64' )
+					}`
+					: ( await thumb.ensureAlpha().raw().toBuffer() ).toString( 'base64' ),
 				width: exportOptions.thumbnail.width,
 				height: exportOptions.thumbnail.height,
 			}),
