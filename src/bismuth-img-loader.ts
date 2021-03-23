@@ -6,7 +6,7 @@ import objHash from 'object-hash';
 
 import defaultOptions from './defaultOptions';
 import deriveQualityOptions from './lib/deriveExportOptions';
-import { ensureCacheDir } from './lib/cache';
+import { prime as primeCache } from './lib/cache';
 import createBasisFile from './lib/createBasisFile';
 import { isPowerOfTwo } from './lib/utils';
 import makePowerOfTwo from './lib/makePowerOfTwo';
@@ -96,8 +96,12 @@ export default async function load( source: string ): Promise<string> {
 		temp.join( '.' )}-${objHash( exportOptions ).substr( 0, options.optionHashLength )
 	}`;
 
-
-	ensureCacheDir( options.cacheDir );
+	const { cacheDir, trackCacheUsage, deleteUnusedCacheFiles } = options;
+	await primeCache({
+		cacheDir,
+		trackCacheUsage,
+		deleteUnusedCacheFiles,
+	});
 
 	const sourceFileStats = await sharp( this.resourcePath ).metadata();
 	const sourceFileBuffer = await fs.readFile( this.resourcePath );
@@ -119,7 +123,6 @@ export default async function load( source: string ): Promise<string> {
 			inputHash: sourceFileHash,
 			inputBuffer: sourceFileBuffer,
 			strategy: exportOptions.powerOfTwoStrategy,
-			cacheDir: options.cacheDir,
 		});
 
 		inputBuffer = resizedTexture.buffer;
@@ -127,7 +130,6 @@ export default async function load( source: string ): Promise<string> {
 	}
 
 	const inputHash = loaderUtils.getHashDigest( inputBuffer, 'md4', 'hex', 32 );
-	const { cacheDir } = options;
 
 	const exportFiles: { ext: string; name: string }[] = [];
 
@@ -136,7 +138,6 @@ export default async function load( source: string ): Promise<string> {
 			inputHash,
 			inputPath,
 			options: exportOptions.basis,
-			cacheDir,
 			reportName: relativePath,
 		});
 
@@ -149,7 +150,6 @@ export default async function load( source: string ): Promise<string> {
 			inputHash,
 			buffer: inputBuffer,
 			options: exportOptions.webp,
-			cacheDir,
 		});
 
 		this.emitFile( `${fileName}.webp`, webp.buffer );
@@ -168,7 +168,6 @@ export default async function load( source: string ): Promise<string> {
 			inputHash,
 			buffer: inputBuffer,
 			options: exportOptions.mozjpeg,
-			cacheDir,
 		});
 
 		this.emitFile( `${fileName}.jpg`, jpg.buffer );
@@ -178,7 +177,6 @@ export default async function load( source: string ): Promise<string> {
 			inputHash,
 			buffer: inputBuffer,
 			options: exportOptions.pngquant,
-			cacheDir,
 		});
 
 		this.emitFile( `${fileName}.png`, png.buffer );

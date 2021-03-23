@@ -10,14 +10,12 @@ interface CreateJpegFileProps {
 	buffer: Buffer;
 	options: ImgLoaderQualityOptions['mozjpeg'];
 	inputHash: string;
-	cacheDir: string;
 }
 
 export default async function createJpegFile({
 	buffer,
 	options,
 	inputHash,
-	cacheDir,
 }: CreateJpegFileProps ): Promise<{
 		buffer: Buffer;
 		path: string;
@@ -25,7 +23,6 @@ export default async function createJpegFile({
 	const cached = await getFile({
 		options,
 		inputHash,
-		cacheDir,
 	});
 
 	if ( cached ) return cached;
@@ -45,7 +42,6 @@ export default async function createJpegFile({
 		buffer: outBuffer,
 		options,
 		inputHash,
-		cacheDir,
 	});
 
 	return {

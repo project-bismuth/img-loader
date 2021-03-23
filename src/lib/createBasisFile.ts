@@ -27,7 +27,6 @@ interface CreateBasisFileProps {
 	inputPath: string;
 	options: BasisOptions;
 	inputHash: string;
-	cacheDir: string;
 	reportName: string;
 }
 
@@ -35,19 +34,18 @@ export default async function createBasisFile({
 	inputPath,
 	options,
 	inputHash,
-	cacheDir,
 	reportName,
 }: CreateBasisFileProps ): Promise<{
 		buffer: Buffer;
 		path: string;
 	}> {
-	const cached = await getFile({ inputHash, options, cacheDir });
+	const cached = await getFile({ inputHash, options });
 
 	if ( cached ) {
 		return cached;
 	}
 
-	const outPath = getFilename({ inputHash, options, cacheDir });
+	const outPath = getFilename({ inputHash, options });
 	const opts: string[] = [];
 
 	opts.push( `-file ${inputPath}` );

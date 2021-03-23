@@ -8,14 +8,12 @@ interface CreateWebpFileProps {
 	buffer: Buffer;
 	options: ImgLoaderQualityOptions['webp'];
 	inputHash: string;
-	cacheDir: string;
 }
 
 export default async function createWebpFile({
 	buffer,
 	options,
 	inputHash,
-	cacheDir,
 }: CreateWebpFileProps ): Promise<{
 		buffer: Buffer;
 		path: string;
@@ -23,7 +21,6 @@ export default async function createWebpFile({
 	const cached = await getFile({
 		options,
 		inputHash,
-		cacheDir,
 	});
 
 	if ( cached ) return cached;
@@ -33,7 +30,6 @@ export default async function createWebpFile({
 		buffer: outBuffer,
 		options,
 		inputHash,
-		cacheDir,
 	});
 
 	return {

@@ -74,7 +74,6 @@ interface MakePowerOfTwoProps {
 	strategy: ImgLoaderOptions['powerOfTwoStrategy'];
 	width: number;
 	height: number;
-	cacheDir: string;
 }
 
 export default async function makePowerOfTwo({
@@ -83,7 +82,6 @@ export default async function makePowerOfTwo({
 	strategy = 'area',
 	inputHash,
 	inputBuffer,
-	cacheDir,
 }: MakePowerOfTwoProps ): Promise<{
 		buffer: Buffer;
 		path: string;
@@ -92,7 +90,6 @@ export default async function makePowerOfTwo({
 	const cacheOpts = {
 		inputHash,
 		options: size,
-		cacheDir,
 		ext: '.png',
 	};
 
