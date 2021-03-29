@@ -2,8 +2,8 @@
 	"name": "@bismuth/img-loader",
 	"version": "1.0.0",
 	"description": "Magical image loading.",
-	"main": "dist/cjs/bismuth-img-loader.js",
-	"module": "dist/esm/bismuth-img-loader.js",
+	"main": "dist/cjs/index.js",
+	"module": "dist/esm/index.js",
 	"repository": "",
 	"author": "johh <johannes@resn.co.nz>",
 	"license": "BSD-4-Clause",
@@ -48,6 +48,7 @@
 	},
 	"dependencies": {
 		"@types/imagemin-mozjpeg": "^8.0.0",
+		"chalk": "^4.1.0",
 		"imagemin": "^7.0.1",
 		"imagemin-mozjpeg": "^9.0.0",
 		"imagemin-pngquant": "^9.0.1",

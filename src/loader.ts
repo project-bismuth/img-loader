@@ -25,8 +25,9 @@ interface QueryParams {
 let generatedDeclarations = false;
 
 export default async function load( source: string ): Promise<string> {
-	if ( this.cacheable ) this.cacheable();
+	if ( this.cacheable ) this.cacheable( false );
 
+	const { resource } = this;
 	const options = { ...defaultOptions, ...( loaderUtils.getOptions( this ) || {}) };
 	const context = options.context || this.rootContext;
 	const params = this.resourceQuery
@@ -96,10 +97,9 @@ export default async function load( source: string ): Promise<string> {
 		temp.join( '.' )}-${objHash( exportOptions ).substr( 0, options.optionHashLength )
 	}`;
 
-	const { cacheDir, trackCacheUsage, deleteUnusedCacheFiles } = options;
+	const { cacheDir, deleteUnusedCacheFiles } = options;
 	await primeCache({
 		cacheDir,
-		trackCacheUsage,
 		deleteUnusedCacheFiles,
 	});
 
@@ -123,6 +123,7 @@ export default async function load( source: string ): Promise<string> {
 			inputHash: sourceFileHash,
 			inputBuffer: sourceFileBuffer,
 			strategy: exportOptions.powerOfTwoStrategy,
+			resource,
 		});
 
 		inputBuffer = resizedTexture.buffer;
@@ -139,6 +140,7 @@ export default async function load( source: string ): Promise<string> {
 			inputPath,
 			options: exportOptions.basis,
 			reportName: relativePath,
+			resource,
 		});
 
 		this.emitFile( `${fileName}.basis`, basis.buffer );
@@ -150,6 +152,7 @@ export default async function load( source: string ): Promise<string> {
 			inputHash,
 			buffer: inputBuffer,
 			options: exportOptions.webp,
+			resource,
 		});
 
 		this.emitFile( `${fileName}.webp`, webp.buffer );
@@ -168,6 +171,7 @@ export default async function load( source: string ): Promise<string> {
 			inputHash,
 			buffer: inputBuffer,
 			options: exportOptions.mozjpeg,
+			resource,
 		});
 
 		this.emitFile( `${fileName}.jpg`, jpg.buffer );
@@ -177,6 +181,7 @@ export default async function load( source: string ): Promise<string> {
 			inputHash,
 			buffer: inputBuffer,
 			options: exportOptions.pngquant,
+			resource,
 		});
 
 		this.emitFile( `${fileName}.png`, png.buffer );
@@ -232,5 +237,3 @@ export default async function load( source: string ): Promise<string> {
 		};
 	`;
 }
-
-export const raw = true;

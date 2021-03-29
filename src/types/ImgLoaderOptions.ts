@@ -43,7 +43,6 @@ type ImgLoaderOptions = {
 	context?: string;
 	optionHashLength: number;
 	generateDeclarations: boolean;
-	trackCacheUsage: boolean;
 	deleteUnusedCacheFiles: boolean;
 	qualityLevels: Record<string, ImgLoaderQualityOptions>;
 	defaultQualityLevel: string;

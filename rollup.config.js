@@ -4,7 +4,7 @@ import { terser } from 'rollup-plugin-terser';
 
 
 export default {
-	input: './src/bismuth-img-loader.ts',
+	input: './src/index.ts',
 
 	output: [
 		{
@@ -42,7 +42,7 @@ export default {
 						{
 							privatePrefix: '_private_',
 							internalPrefix: '',
-							entrySourceFiles: ['./src/bismuth-img-loader.ts'],
+							entrySourceFiles: ['./src/index.ts'],
 						},
 					),
 				],

@@ -1,6 +1,7 @@
 import objHash from 'object-hash';
 import path from 'path';
 import { promises as fs } from 'fs';
+import chalk from 'chalk';
 
 import { fileExists } from './utils';
 
@@ -8,59 +9,75 @@ import { fileExists } from './utils';
 interface CacheProps {
 	inputHash: string;
 	options: unknown;
+	resource: string;
 	ext?: string;
 }
 
 
 let isPrimed = false;
 let cacheDir = '';
-let trackCacheUsage = false;
-let usageHistoryFileReady: Promise<void>;
+let deleteUnusedCacheFiles = false;
+const initialFiles: string[] = [];
+const cacheMap = new Map<string, string[]>();
+
+
+export async function clearStaleFiles( usedFiles: string[]): Promise<void[]|void> {
+	if ( !deleteUnusedCacheFiles ) return Promise.resolve();
+
+	const usedCacheFiles: string[] = [];
+	const potentiallyStaleFiles: string[] = [
+		...initialFiles.map( f => path.resolve( cacheDir, f ) ),
+	];
+
+	initialFiles.length = 0;
+
+	cacheMap.forEach( ( cacheFiles, key ) => {
+		if ( usedFiles.includes( key ) ) {
+			usedCacheFiles.push( ...cacheFiles );
+		} else {
+			potentiallyStaleFiles.push( ...cacheFiles );
+			cacheMap.delete( key );
+		}
+	});
+
+	const staleFiles = new Set(
+		potentiallyStaleFiles.filter( file => !usedCacheFiles.includes( file ) ),
+	);
+
+	if ( staleFiles.size > 0 ) {
+		// eslint-disable-next-line no-console
+		console.info( chalk.yellow(
+			`deleting ${staleFiles.size} stale files...`,
+		) );
+
+		return Promise.all(
+			Array.from( staleFiles.values() ).map( file => fs.unlink( file ) ),
+		);
+	}
+
+	return Promise.resolve();
+}
+
 
 export async function prime({
 	cacheDir: _cacheDir,
-	trackCacheUsage: _trackCacheUsage,
-	deleteUnusedCacheFiles,
+	deleteUnusedCacheFiles: _deleteUnusedCacheFiles,
 }: {
 	cacheDir: string;
-	trackCacheUsage: boolean;
 	deleteUnusedCacheFiles: boolean;
 }): Promise<string|void> {
 	if ( !isPrimed ) {
 		cacheDir = _cacheDir;
-		trackCacheUsage = _trackCacheUsage;
+		deleteUnusedCacheFiles = _deleteUnusedCacheFiles;
 		isPrimed = true;
 
-		await fs.mkdir( cacheDir, { recursive: true });
-
-		const usageHistoryFile = path.resolve( cacheDir, 'usage.txt' );
-
-		if ( deleteUnusedCacheFiles && await fileExists( usageHistoryFile ) ) {
-			const usedFiles = (
-				await fs.readFile( usageHistoryFile, { encoding: 'utf-8' })
-			).split( '\n' );
-
-			if ( usedFiles.length > 1 ) {
-				const unusedFiles = (
-					await fs.readdir( path.resolve( cacheDir ) )
-				).filter( v => !usedFiles.includes( v ) );
-
-				// eslint-disable-next-line no-console
-				console.info( `deleting ${unusedFiles.length} stale files...` );
-				await Promise.all(
-					unusedFiles.map( f => fs.unlink( path.resolve( cacheDir, f ) ) ),
-				);
-			} else {
-				// eslint-disable-next-line no-console
-				console.info( 'No files flagged as in use. This may be an error. Skipping...' );
-			}
+		if ( deleteUnusedCacheFiles ) {
+			initialFiles.push(
+				...await fs.readdir( path.resolve( cacheDir ) ),
+			);
 		}
-		if ( trackCacheUsage ) {
-			usageHistoryFileReady = fs.writeFile( usageHistoryFile, '' );
-			return usageHistoryFileReady;
-		}
-	} else if ( trackCacheUsage ) {
-		return usageHistoryFileReady;
+
+		return fs.mkdir( cacheDir, { recursive: true });
 	}
 
 	return Promise.resolve();
@@ -70,13 +87,16 @@ export async function prime({
 export function getFilename({
 	inputHash,
 	options,
+	resource,
 	ext = '',
 }: CacheProps ): string {
-	const name = `${inputHash}-${objHash( options )}${ext}`;
+	const name = path.resolve( cacheDir, `${inputHash}-${objHash( options )}${ext}` );
 
-	if ( trackCacheUsage ) fs.appendFile( path.resolve( cacheDir, 'usage.txt' ), `\n${name}` );
+	if ( !cacheMap.has( resource ) ) cacheMap.set( resource, []);
 
-	return path.resolve( cacheDir, name );
+	cacheMap.get( resource ).push( name );
+
+	return name;
 }
 
 

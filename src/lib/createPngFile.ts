@@ -10,12 +10,14 @@ interface CreatePngFileProps {
 	buffer: Buffer;
 	options: ImgLoaderQualityOptions['pngquant'];
 	inputHash: string;
+	resource: string;
 }
 
 export default async function createPngFile({
 	buffer,
 	options,
 	inputHash,
+	resource,
 }: CreatePngFileProps ): Promise<{
 		buffer: Buffer;
 		path: string;
@@ -23,6 +25,7 @@ export default async function createPngFile({
 	const cached = await getFile({
 		options,
 		inputHash,
+		resource,
 	});
 
 	if ( cached ) return cached;
@@ -39,6 +42,7 @@ export default async function createPngFile({
 		buffer: outBuffer,
 		options,
 		inputHash,
+		resource,
 	});
 
 	return {
