@@ -1,4 +1,4 @@
 export { default } from './loader';
-export { default as ClearCachePlugin } from './plugin';
+export { default as CachePlugin } from './plugin';
 
 export const raw = true;
