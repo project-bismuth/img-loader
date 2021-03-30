@@ -11,7 +11,11 @@ function mergeBasisOptions(
 		...overrideOptions,
 	};
 
-	if ( 'quality' in mergedOptions && !( 'quality' in overrideOptions ) ) {
+	if (
+		'quality' in mergedOptions
+		&& !( 'quality' in overrideOptions )
+		&& ( 'maxEndpoints' in overrideOptions || 'maxSelectors' in overrideOptions )
+	) {
 		// 'quality' is used to switch between auto and manual ETC1S mode
 		// Here the baseOptions are for auto mode, while the overrides are for manual mode.
 		// to ensure manual mode is used, delete the quality option.
