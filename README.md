@@ -185,9 +185,7 @@ To include the declarations in your TS setup, add this to your `tsconfig.json`:
 
 ```JSON
 {
-	// ...
 	"include": [
-		// ...
 		"./img-imports.d.ts"
 	]
 }
@@ -233,8 +231,8 @@ Please refer to the [basis repo](https://github.com/BinomialLLC/basis_universal#
 
 A `basis` options object can have the following props:
 
-|Name|Type|Codec|basisu equivalent / description
-|---|---|:-:|----|---|
+|Name|Type|Codec|basisu equivalent / description|
+|---|---|:-:|---|
 `forceAlpha`|`boolean`||`-force_alpha`
 `mipmaps`|`boolean`||`-mipmaps`
 `mipFilter`|`string`||`-mip_filter filter`, defaults to `'lanczos3'`.<br>See [`BasisOptions.ts`](https://github.com/johh/bismuth-img-loader/blob/master/src/types/BasisOptions.ts) for all possible values.
