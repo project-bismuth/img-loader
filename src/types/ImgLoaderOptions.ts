@@ -39,11 +39,9 @@ export interface ImgLoaderQualityOptions {
 type ImgLoaderOptions = {
 	name: string;
 	outputPath: string;
-	cacheDir: string;
 	context?: string;
 	optionHashLength: number;
 	generateDeclarations: boolean;
-	deleteUnusedCacheFiles: boolean;
 	qualityLevels: Record<string, ImgLoaderQualityOptions>;
 	defaultQualityLevel: string;
 	modes: Record<string, ModeOptions>;

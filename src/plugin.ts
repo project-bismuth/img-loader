@@ -1,43 +1,55 @@
 import type { Compiler, NormalModule } from 'webpack';
 
-import { clearStaleFiles } from './lib/cache';
+import { clearStaleFiles, prime as primeCache } from './lib/cache';
 
 
-interface ClearCachePluginProps {
+interface CachePluginProps {
 	enabled: boolean;
+	deleteUnusedFiles: boolean;
 	aggressive: boolean;
+	cacheDir: string;
 }
 
-export default class ClearCachePlugin {
+export default class BismuthCachePlugin {
 	private enabled: boolean;
+	private deleteUnusedFiles: boolean;
 	private aggressive: boolean;
 	private runs = 0;
 
 	constructor({
 		enabled = true,
+		deleteUnusedFiles = true,
 		aggressive = true,
-	}: Partial<ClearCachePluginProps> = {}) {
+		cacheDir = '.img-loader-cache',
+	}: Partial<CachePluginProps> = {}) {
 		this.enabled = enabled;
+		this.deleteUnusedFiles = deleteUnusedFiles;
 		this.aggressive = aggressive;
+
+		primeCache({
+			cacheDir,
+		});
 	}
 
 	apply( compiler: Compiler ): void {
-		compiler.hooks.done.tapAsync(
-			'BismuthClearCachePlugin', async ( stats, cb: () => void ) => {
-				if ( this.enabled && ( this.aggressive || ( this.runs < 1 ) ) ) {
-					this.runs += 1;
+		if ( this.enabled ) {
+			compiler.hooks.done.tapAsync(
+				'BismuthCachePlugin', async ( stats, cb: () => void ) => {
+					if ( this.deleteUnusedFiles && ( this.aggressive || ( this.runs < 1 ) ) ) {
+						this.runs += 1;
 
-					clearStaleFiles(
-						Array.from(
-							stats.compilation.modules,
-						).map(
-							( m: NormalModule ) => m.userRequest,
-						),
-					).then( () => cb() );
-				} else {
-					cb();
-				}
-			},
-		);
+						clearStaleFiles(
+							Array.from(
+								stats.compilation.modules,
+							).map(
+								( m: NormalModule ) => m.userRequest,
+							),
+						).then( () => cb() );
+					} else {
+						cb();
+					}
+				},
+			);
+		}
 	}
 }

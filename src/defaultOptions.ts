@@ -3,8 +3,6 @@ import type ImgLoaderOptions from './types/ImgLoaderOptions';
 const defaultOptions: ImgLoaderOptions = {
 	name: '[name].[contenthash:6].[ext]',
 	outputPath: '',
-	cacheDir: '.img-loader-cache',
-	deleteUnusedCacheFiles: true,
 	optionHashLength: 4,
 	generateDeclarations: false,
 	thumbnail: {

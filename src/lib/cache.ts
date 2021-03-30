@@ -16,14 +16,12 @@ interface CacheProps {
 
 let isPrimed = false;
 let cacheDir = '';
-let deleteUnusedCacheFiles = false;
+let cacheReady: Promise<string|void>;
 const initialFiles: string[] = [];
 const cacheMap = new Map<string, string[]>();
 
 
 export async function clearStaleFiles( usedFiles: string[]): Promise<void[]|void> {
-	if ( !deleteUnusedCacheFiles ) return Promise.resolve();
-
 	const usedCacheFiles: string[] = [];
 	const potentiallyStaleFiles: string[] = [
 		...initialFiles.map( f => path.resolve( cacheDir, f ) ),
@@ -61,26 +59,30 @@ export async function clearStaleFiles( usedFiles: string[]): Promise<void[]|void
 
 export async function prime({
 	cacheDir: _cacheDir,
-	deleteUnusedCacheFiles: _deleteUnusedCacheFiles,
 }: {
 	cacheDir: string;
-	deleteUnusedCacheFiles: boolean;
 }): Promise<string|void> {
-	if ( !isPrimed ) {
-		cacheDir = _cacheDir;
-		deleteUnusedCacheFiles = _deleteUnusedCacheFiles;
-		isPrimed = true;
+	cacheReady = ( async () => {
+		if ( !isPrimed ) {
+			cacheDir = _cacheDir;
+			isPrimed = true;
 
-		if ( deleteUnusedCacheFiles ) {
 			initialFiles.push(
 				...await fs.readdir( path.resolve( cacheDir ) ),
 			);
+
+			return fs.mkdir( cacheDir, { recursive: true });
 		}
 
-		return fs.mkdir( cacheDir, { recursive: true });
-	}
+		return Promise.resolve();
+	})();
 
-	return Promise.resolve();
+	return cacheReady;
+}
+
+
+export async function ensureCacheReady(): Promise<string|void> {
+	return cacheReady;
 }
 
 

@@ -6,7 +6,7 @@ import objHash from 'object-hash';
 
 import defaultOptions from './defaultOptions';
 import deriveQualityOptions from './lib/deriveExportOptions';
-import { prime as primeCache } from './lib/cache';
+import { ensureCacheReady } from './lib/cache';
 import createBasisFile from './lib/createBasisFile';
 import { isPowerOfTwo } from './lib/utils';
 import makePowerOfTwo from './lib/makePowerOfTwo';
@@ -97,11 +97,7 @@ export default async function load( source: string ): Promise<string> {
 		temp.join( '.' )}-${objHash( exportOptions ).substr( 0, options.optionHashLength )
 	}`;
 
-	const { cacheDir, deleteUnusedCacheFiles } = options;
-	await primeCache({
-		cacheDir,
-		deleteUnusedCacheFiles,
-	});
+	await ensureCacheReady();
 
 	const sourceFileStats = await sharp( this.resourcePath ).metadata();
 	const sourceFileBuffer = await fs.readFile( this.resourcePath );
