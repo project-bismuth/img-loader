@@ -77,8 +77,14 @@ export default async function createBasisFile({
 
 	if ( options.codec === 'UASTC' ) {
 		opts.push( '-uastc' );
-		opts.push( `-uastc_level ${options.uastcLevel}` );
-		opts.push( `-uastc_rdo_q ${options.uastcRdoQ}` );
+
+		if ( options.uastcLevel ) {
+			opts.push( `-uastc_level ${options.uastcLevel}` );
+		}
+
+		if ( options.uastcRdoQ ) {
+			opts.push( `-uastc_rdo_q ${options.uastcRdoQ}` );
+		}
 	} else {
 		if ( 'quality' in options ) {
 			// ETC1S with auto options
@@ -89,7 +95,9 @@ export default async function createBasisFile({
 			opts.push( `-max_selectors ${options.maxSelectors}` );
 		}
 
-		opts.push( `-comp_level ${options.compLevel}` );
+		if ( options.compLevel ) {
+			opts.push( `-comp_level ${options.compLevel}` );
+		}
 
 		if ( options.noEndpointRdo ) {
 			opts.push( '-no_endpoint_rdo' );
