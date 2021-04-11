@@ -1,6 +1,6 @@
 import type { Compiler, NormalModule } from 'webpack';
 
-import { clearStaleFiles, prime as primeCache } from './lib/cache';
+import { clearStaleFiles, ensureCacheReady, prime as primeCache } from './lib/cache';
 
 
 interface CachePluginProps {
@@ -35,6 +35,8 @@ export default class BismuthCachePlugin {
 		if ( this.enabled ) {
 			compiler.hooks.done.tapAsync(
 				'BismuthCachePlugin', async ( stats, cb: () => void ) => {
+					await ensureCacheReady();
+
 					if ( this.deleteUnusedFiles && ( this.aggressive || ( this.runs < 1 ) ) ) {
 						this.runs += 1;
 
