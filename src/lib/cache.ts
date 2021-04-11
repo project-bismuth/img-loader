@@ -21,7 +21,25 @@ const initialFiles: string[] = [];
 const cacheMap = new Map<string, string[]>();
 
 
+function ensureCachePrimed() {
+	if ( !isPrimed ) {
+		throw new Error(
+			'[@bismuth/img-loader]: The cache management plugin is not running.',
+		);
+	}
+}
+
+
+export async function ensureCacheReady(): Promise<void> {
+	ensureCachePrimed();
+
+	return cacheReady;
+}
+
+
 export async function clearStaleFiles( usedFiles: string[]): Promise<void[]|void> {
+	ensureCachePrimed();
+
 	const usedCacheFiles: string[] = [];
 	const potentiallyStaleFiles: string[] = [
 		...initialFiles.map( f => path.resolve( cacheDir, f ) ),
@@ -62,6 +80,8 @@ export async function prime({
 }: {
 	cacheDir: string;
 }): Promise<string|void> {
+	if ( cacheReady ) return cacheReady;
+
 	cacheReady = ( async () => {
 		if ( !isPrimed ) {
 			cacheDir = _cacheDir;
@@ -81,17 +101,14 @@ export async function prime({
 }
 
 
-export async function ensureCacheReady(): Promise<string|void> {
-	return cacheReady;
-}
-
-
 export function getFilename({
 	inputHash,
 	options,
 	resource,
 	ext = '',
 }: CacheProps ): string {
+	ensureCachePrimed();
+
 	const name = path.resolve( cacheDir, `${inputHash}-${objHash( options )}${ext}` );
 
 	if ( !cacheMap.has( resource ) ) cacheMap.set( resource, []);
@@ -106,6 +123,8 @@ export async function getFile( opts: CacheProps ): Promise<{
 	buffer: Buffer;
 	path: string;
 } | false> {
+	ensureCachePrimed();
+
 	const fileName = getFilename( opts );
 
 	if ( !await fileExists( fileName ) ) return false;
@@ -121,6 +140,8 @@ export async function writeFile({
 	buffer,
 	...opts
 }: CacheProps & { buffer: Buffer }): Promise<string> {
+	ensureCachePrimed();
+
 	const fileName = getFilename( opts );
 
 	await fs.writeFile( fileName, buffer );
