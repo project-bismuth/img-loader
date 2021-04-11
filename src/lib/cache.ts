@@ -16,7 +16,7 @@ interface CacheProps {
 
 let isPrimed = false;
 let cacheDir = '';
-let cacheReady: Promise<string|void>;
+let cacheReady: Promise<void>;
 const initialFiles: string[] = [];
 const cacheMap = new Map<string, string[]>();
 
@@ -79,7 +79,7 @@ export async function prime({
 	cacheDir: _cacheDir,
 }: {
 	cacheDir: string;
-}): Promise<string|void> {
+}): Promise<void> {
 	if ( cacheReady ) return cacheReady;
 
 	cacheReady = ( async () => {
@@ -87,11 +87,11 @@ export async function prime({
 			cacheDir = _cacheDir;
 			isPrimed = true;
 
+			await fs.mkdir( cacheDir, { recursive: true });
+
 			initialFiles.push(
 				...await fs.readdir( path.resolve( cacheDir ) ),
 			);
-
-			return fs.mkdir( cacheDir, { recursive: true });
 		}
 
 		return Promise.resolve();
