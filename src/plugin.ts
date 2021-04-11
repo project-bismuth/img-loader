@@ -40,16 +40,16 @@ export default class BismuthCachePlugin {
 					if ( this.deleteUnusedFiles && ( this.aggressive || ( this.runs < 1 ) ) ) {
 						this.runs += 1;
 
-						clearStaleFiles(
+						await clearStaleFiles(
 							Array.from(
 								stats.compilation.modules,
 							).map(
 								( m: NormalModule ) => m.userRequest,
 							),
-						).then( () => cb() );
-					} else {
-						cb();
+						);
 					}
+
+					cb();
 				},
 			);
 		}
