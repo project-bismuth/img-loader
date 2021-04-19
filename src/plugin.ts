@@ -37,7 +37,11 @@ export default class BismuthCachePlugin {
 				'BismuthCachePlugin', async ( stats, cb: () => void ) => {
 					await ensureCacheReady();
 
-					if ( this.deleteUnusedFiles && ( this.aggressive || ( this.runs < 1 ) ) ) {
+					if (
+						this.deleteUnusedFiles
+						&& ( this.aggressive || ( this.runs < 1 ) )
+						&& !stats.compilation.errors
+					) {
 						this.runs += 1;
 
 						await clearStaleFiles(
