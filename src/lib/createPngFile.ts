@@ -4,6 +4,7 @@ import sharp from 'sharp';
 
 import type { ImgLoaderQualityOptions } from '../types/ImgLoaderOptions';
 import { getFile, writeFile } from './cache';
+import { completeJob, trackJob } from './jobTracker';
 
 
 interface CreatePngFileProps {
@@ -11,6 +12,7 @@ interface CreatePngFileProps {
 	options: ImgLoaderQualityOptions['pngquant'];
 	inputHash: string;
 	resource: string;
+	reportName: string;
 }
 
 export default async function createPngFile({
@@ -18,6 +20,7 @@ export default async function createPngFile({
 	options,
 	inputHash,
 	resource,
+	reportName,
 }: CreatePngFileProps ): Promise<{
 		buffer: Buffer;
 		path: string;
@@ -29,6 +32,11 @@ export default async function createPngFile({
 	});
 
 	if ( cached ) return cached;
+
+	const job = trackJob({
+		reportName,
+		text: 'compressing .png',
+	});
 
 	const img = await sharp( buffer ).png().toBuffer();
 
@@ -44,6 +52,8 @@ export default async function createPngFile({
 		inputHash,
 		resource,
 	});
+
+	completeJob( job );
 
 	return {
 		buffer: outBuffer,

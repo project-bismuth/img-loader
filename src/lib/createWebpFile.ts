@@ -2,6 +2,7 @@ import sharp from 'sharp';
 
 import type { ImgLoaderQualityOptions } from '../types/ImgLoaderOptions';
 import { getFile, writeFile } from './cache';
+import { completeJob, trackJob } from './jobTracker';
 
 
 interface CreateWebpFileProps {
@@ -9,6 +10,7 @@ interface CreateWebpFileProps {
 	options: ImgLoaderQualityOptions['webp'];
 	inputHash: string;
 	resource: string;
+	reportName: string;
 }
 
 export default async function createWebpFile({
@@ -16,6 +18,7 @@ export default async function createWebpFile({
 	options,
 	inputHash,
 	resource,
+	reportName,
 }: CreateWebpFileProps ): Promise<{
 		buffer: Buffer;
 		path: string;
@@ -28,6 +31,11 @@ export default async function createWebpFile({
 
 	if ( cached ) return cached;
 
+	const job = trackJob({
+		reportName,
+		text: 'compressing .webp',
+	});
+
 	const outBuffer = await sharp( buffer ).webp( options ).toBuffer();
 	const path = await writeFile({
 		buffer: outBuffer,
@@ -35,6 +43,8 @@ export default async function createWebpFile({
 		inputHash,
 		resource,
 	});
+
+	completeJob( job );
 
 	return {
 		path,

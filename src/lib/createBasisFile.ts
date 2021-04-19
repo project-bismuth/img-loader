@@ -2,10 +2,10 @@ import path from 'path';
 import { promises as fs } from 'fs';
 import { promisify } from 'util';
 import { exec } from 'child_process';
-import ora from 'ora';
 
 import type BasisOptions from '../types/BasisOptions';
 import { getFile, getFilename } from './cache';
+import { trackJob, completeJob } from './jobTracker';
 
 const asyncExec = promisify( exec );
 
@@ -112,20 +112,18 @@ export default async function createBasisFile({
 		}
 	}
 
-	const spinner = ora( `compressing ${reportName}` );
-	spinner.spinner = 'triangle';
-	spinner.start();
+	const job = trackJob({
+		reportName,
+		text: 'compressing .basis',
+	});
 
 	const { stderr } = await asyncExec( `${bin} ${opts.join( ' ' )}` );
 
-	// eslint-disable-next-line no-console
-	// console.log( stdout );
 
 	if ( stderr ) {
-		spinner.fail();
 		throw new Error( `BASIS COMPRESSION FAILED: ${stderr}` );
 	} else {
-		spinner.succeed();
+		completeJob( job );
 	}
 
 

@@ -4,6 +4,7 @@ import sharp from 'sharp';
 
 import type { ImgLoaderQualityOptions } from '../types/ImgLoaderOptions';
 import { getFile, writeFile } from './cache';
+import { completeJob, trackJob } from './jobTracker';
 
 
 interface CreateJpegFileProps {
@@ -11,6 +12,7 @@ interface CreateJpegFileProps {
 	options: ImgLoaderQualityOptions['mozjpeg'];
 	inputHash: string;
 	resource: string;
+	reportName: string;
 }
 
 export default async function createJpegFile({
@@ -18,6 +20,7 @@ export default async function createJpegFile({
 	options,
 	inputHash,
 	resource,
+	reportName,
 }: CreateJpegFileProps ): Promise<{
 		buffer: Buffer;
 		path: string;
@@ -29,6 +32,11 @@ export default async function createJpegFile({
 	});
 
 	if ( cached ) return cached;
+
+	const job = trackJob({
+		reportName,
+		text: 'compressing .jpg',
+	});
 
 	const img = await sharp( buffer ).jpeg({
 		quality: 100,
@@ -47,6 +55,8 @@ export default async function createJpegFile({
 		inputHash,
 		resource,
 	});
+
+	completeJob( job );
 
 	return {
 		buffer: outBuffer,

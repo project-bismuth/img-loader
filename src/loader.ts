@@ -119,6 +119,7 @@ export default async function load( source: string ): Promise<string> {
 			inputHash: sourceFileHash,
 			inputBuffer: sourceFileBuffer,
 			strategy: exportOptions.powerOfTwoStrategy,
+			reportName: relativePath,
 			resource,
 		});
 
@@ -148,6 +149,7 @@ export default async function load( source: string ): Promise<string> {
 			inputHash,
 			buffer: inputBuffer,
 			options: exportOptions.webp,
+			reportName: relativePath,
 			resource,
 		});
 
@@ -163,6 +165,7 @@ export default async function load( source: string ): Promise<string> {
 			inputHash,
 			buffer: inputBuffer,
 			options: exportOptions.mozjpeg,
+			reportName: relativePath,
 			resource,
 		});
 
@@ -173,6 +176,7 @@ export default async function load( source: string ): Promise<string> {
 			inputHash,
 			buffer: inputBuffer,
 			options: exportOptions.pngquant,
+			reportName: relativePath,
 			resource,
 		});
 

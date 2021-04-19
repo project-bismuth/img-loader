@@ -2,6 +2,7 @@ import sharp from 'sharp';
 
 import type ImgLoaderOptions from '../types/ImgLoaderOptions';
 import { getFile, writeFile } from './cache';
+import { completeJob, trackJob } from './jobTracker';
 
 
 function nextPowerOfTwo( n: number ) {
@@ -75,6 +76,7 @@ interface MakePowerOfTwoProps {
 	width: number;
 	height: number;
 	resource: string;
+	reportName: string;
 }
 
 export default async function makePowerOfTwo({
@@ -84,6 +86,7 @@ export default async function makePowerOfTwo({
 	inputHash,
 	inputBuffer,
 	resource,
+	reportName,
 }: MakePowerOfTwoProps ): Promise<{
 		buffer: Buffer;
 		path: string;
@@ -100,16 +103,24 @@ export default async function makePowerOfTwo({
 
 	if ( cached ) return cached;
 
+	const job = trackJob({
+		reportName,
+		text: 'resizing',
+	});
+
 	const texture = sharp( inputBuffer );
 	texture.resize( size[0], size[1], { fit: 'fill' });
 
 	const buffer = await texture.png().toBuffer();
+	const path = await writeFile({
+		buffer,
+		...cacheOpts,
+	});
+
+	completeJob( job );
 
 	return {
 		buffer,
-		path: await writeFile({
-			buffer,
-			...cacheOpts,
-		}),
+		path,
 	};
 }
