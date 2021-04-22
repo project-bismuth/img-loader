@@ -186,9 +186,11 @@ export default async function load( source: string ): Promise<string> {
 		exportFiles.push({ ext: fileExt, name: 'src' });
 	} else {
 		this.emitWarning(
-			`${
-				fileExt
-			} files are currently not supported, the file will not be compressed.`,
+			new Error(
+				`${
+					fileExt
+				} files are currently not supported, the file will not be compressed.`,
+			),
 		);
 
 		this.emitFile( `${fileName}.${fileExt}`, inputBuffer );
