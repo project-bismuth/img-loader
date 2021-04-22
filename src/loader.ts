@@ -25,7 +25,7 @@ interface QueryParams {
 let generatedDeclarations = false;
 
 export default async function load( source: string ): Promise<string> {
-	if ( this.cacheable ) this.cacheable( false );
+	if ( this.cacheable ) this.cacheable();
 
 	const { resource } = this;
 	const options = { ...defaultOptions, ...( loaderUtils.getOptions( this ) || {}) };
