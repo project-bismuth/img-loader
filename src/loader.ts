@@ -34,8 +34,10 @@ export default async function load( source: string ): Promise<string> {
 		? loaderUtils.parseQuery( this.resourceQuery ) as QueryParams
 		: {};
 
-	const relativePath = this.resourcePath.replace( this.rootContext, '' );
-
+	const relativePath = this.resourcePath
+		.replace( this.rootContext, '' )
+		.split( path.sep )
+		.join( path.posix.sep );
 
 	if (
 		!generatedDeclarations
