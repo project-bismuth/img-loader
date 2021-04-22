@@ -40,7 +40,7 @@ export default class BismuthCachePlugin {
 					if (
 						this.deleteUnusedFiles
 						&& ( this.aggressive || ( this.runs < 1 ) )
-						&& !stats.compilation.errors
+						&& stats.compilation.errors.length === 0
 					) {
 						this.runs += 1;
 
