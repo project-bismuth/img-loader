@@ -32,6 +32,9 @@ const defaultOptions: ImgLoaderOptions = {
 				quality: 50,
 				progressive: true,
 			},
+			gifsicle: {
+				optimizationLevel: 3,
+			},
 			basis: {
 				codec: 'ETC1S',
 				forceAlpha: true,
@@ -62,6 +65,9 @@ const defaultOptions: ImgLoaderOptions = {
 			mozjpeg: {
 				quality: 75,
 				progressive: true,
+			},
+			gifsicle: {
+				optimizationLevel: 2,
 			},
 			basis: {
 				codec: 'ETC1S',
@@ -94,6 +100,9 @@ const defaultOptions: ImgLoaderOptions = {
 			mozjpeg: {
 				quality: 90,
 				progressive: true,
+			},
+			gifsicle: {
+				optimizationLevel: 1,
 			},
 			basis: {
 				codec: 'UASTC',

@@ -95,6 +95,7 @@ export default function deriveExportOptions({
 							? modeQuality.pngquant.quality as [number, number]
 							: baseQuality.pngquant.quality,
 				},
+				gifsicle: { ...baseQuality.gifsicle, ...( modeQuality.gifsicle || {}) },
 				basis: mergeBasisOptions( baseQuality.basis, modeQuality.basis || {}),
 			};
 		}

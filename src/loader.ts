@@ -13,6 +13,7 @@ import makePowerOfTwo from './lib/makePowerOfTwo';
 import createWebpFile from './lib/createWebpFile';
 import createJpegFile from './lib/createJpegFile';
 import createPngFile from './lib/createPngFile';
+import createGifFile from './lib/createGifFile';
 import generateDeclarations from './lib/generateDeclarations';
 import getDefaultQuality from './lib/getDefaultQuality';
 
@@ -134,16 +135,26 @@ export default async function load( source: string ): Promise<string> {
 	const exportFiles: { ext: string; name: string }[] = [];
 
 	if ( exportOptions.emitBasis ) {
-		const basis = await createBasisFile({
-			inputHash,
-			inputPath,
-			options: exportOptions.basis,
-			reportName: relativePath,
-			resource,
-		});
+		if ( fileExt.match( /png|jpe?g/i ) ) {
+			const basis = await createBasisFile({
+				inputHash,
+				inputPath,
+				options: exportOptions.basis,
+				reportName: relativePath,
+				resource,
+			});
 
-		this.emitFile( `${fileName}.basis`, basis.buffer );
-		exportFiles.push({ ext: 'basis', name: 'basis' });
+			this.emitFile( `${fileName}.basis`, basis.buffer );
+			exportFiles.push({ ext: 'basis', name: 'basis' });
+		} else {
+			this.emitWarning(
+				new Error(
+					`Basis compression is not available for ${
+						fileExt
+					} files. Only jpg and png are supported.`,
+				),
+			);
+		}
 	}
 
 	if ( exportOptions.emitWebp ) {
@@ -183,6 +194,17 @@ export default async function load( source: string ): Promise<string> {
 		});
 
 		this.emitFile( `${fileName}.png`, png.buffer );
+		exportFiles.push({ ext: fileExt, name: 'src' });
+	} else if ( fileExt === 'gif' ) {
+		const gif = await createGifFile({
+			inputHash,
+			buffer: inputBuffer,
+			options: exportOptions.gifsicle,
+			reportName: relativePath,
+			resource,
+		});
+
+		this.emitFile( `${fileName}.gif`, gif.buffer );
 		exportFiles.push({ ext: fileExt, name: 'src' });
 	} else {
 		this.emitWarning(

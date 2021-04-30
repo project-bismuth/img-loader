@@ -1,4 +1,5 @@
 import type * as imageminMozjpeg from 'imagemin-mozjpeg';
+import type * as imageminGifsicle from 'imagemin-gifsicle';
 import type { WebpOptions } from 'sharp';
 import type { Options as PngOptions } from 'imagemin-pngquant';
 import type BasisOptions from './BasisOptions';
@@ -34,6 +35,7 @@ export interface ImgLoaderQualityOptions {
 	pngquant: PngOptions;
 	mozjpeg: imageminMozjpeg.Options;
 	basis: BasisOptions;
+	gifsicle: imageminGifsicle.Options;
 }
 
 type ImgLoaderOptions = {
