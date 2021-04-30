@@ -1,5 +1,6 @@
 import type * as imageminMozjpeg from 'imagemin-mozjpeg';
 import type * as imageminGifsicle from 'imagemin-gifsicle';
+import type * as SVGO from 'svgo';
 import type { WebpOptions } from 'sharp';
 import type { Options as PngOptions } from 'imagemin-pngquant';
 import type BasisOptions from './BasisOptions';
@@ -36,6 +37,7 @@ export interface ImgLoaderQualityOptions {
 	mozjpeg: imageminMozjpeg.Options;
 	basis: BasisOptions;
 	gifsicle: imageminGifsicle.Options;
+	svgo: SVGO.OptimizeOptions;
 }
 
 type ImgLoaderOptions = {

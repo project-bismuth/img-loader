@@ -49,6 +49,7 @@ const exts = [
 	'*.jpeg',
 	'*.png',
 	'*.gif',
+	'*.svg',
 ];
 
 

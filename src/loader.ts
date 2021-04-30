@@ -14,6 +14,7 @@ import createWebpFile from './lib/createWebpFile';
 import createJpegFile from './lib/createJpegFile';
 import createPngFile from './lib/createPngFile';
 import createGifFile from './lib/createGifFile';
+import createSvgFile from './lib/createSvgFile';
 import generateDeclarations from './lib/generateDeclarations';
 import getDefaultQuality from './lib/getDefaultQuality';
 
@@ -205,6 +206,17 @@ export default async function load( source: string ): Promise<string> {
 		});
 
 		this.emitFile( `${fileName}.gif`, gif.buffer );
+		exportFiles.push({ ext: fileExt, name: 'src' });
+	} else if ( fileExt === 'svg' ) {
+		const svg = await createSvgFile({
+			inputHash,
+			buffer: inputBuffer,
+			options: exportOptions.svgo,
+			reportName: relativePath,
+			resource,
+		});
+
+		this.emitFile( `${fileName}.svg`, svg.buffer );
 		exportFiles.push({ ext: fileExt, name: 'src' });
 	} else {
 		this.emitWarning(

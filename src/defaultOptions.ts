@@ -35,6 +35,23 @@ const defaultOptions: ImgLoaderOptions = {
 			gifsicle: {
 				optimizationLevel: 3,
 			},
+			svgo: {
+				floatPrecision: 2,
+				plugins: [
+					{
+						name: 'removeViewBox',
+						active: false,
+					},
+					{
+						name: 'removeDimensions',
+						active: true,
+					},
+					{
+						name: 'reusePaths',
+						active: true,
+					},
+				],
+			},
 			basis: {
 				codec: 'ETC1S',
 				forceAlpha: true,
@@ -68,6 +85,19 @@ const defaultOptions: ImgLoaderOptions = {
 			},
 			gifsicle: {
 				optimizationLevel: 2,
+			},
+			svgo: {
+				floatPrecision: 3,
+				plugins: [
+					{
+						name: 'removeViewBox',
+						active: false,
+					},
+					{
+						name: 'removeDimensions',
+						active: true,
+					},
+				],
 			},
 			basis: {
 				codec: 'ETC1S',
@@ -103,6 +133,19 @@ const defaultOptions: ImgLoaderOptions = {
 			},
 			gifsicle: {
 				optimizationLevel: 1,
+			},
+			svgo: {
+				floatPrecision: 5,
+				plugins: [
+					{
+						name: 'removeViewBox',
+						active: false,
+					},
+					{
+						name: 'removeDimensions',
+						active: true,
+					},
+				],
 			},
 			basis: {
 				codec: 'UASTC',

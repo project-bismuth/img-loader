@@ -29,7 +29,7 @@ export default {
 		rules: [
 			// ...
 			{
-				test: /\.(jpe?g|png|gif)$/i,
+				test: /\.(jpe?g|png|gif|svg)$/i,
 				use: [{
 					loader: '@bismuth/img-loader',
 					options: {
@@ -135,6 +135,7 @@ Each quality level object accepts the following properties:
 `pngquant`|`object`|PNG compression options. See [imagemin-pngquant options](https://github.com/imagemin/imagemin-pngquant#options).|
 `mozjpeg`|`object`|JPEG compression options. See [imagemin-mozjpeg options](https://github.com/imagemin/imagemin-mozjpeg#options).|
 `gifsicle`|`object`|GIF compression options. See [imagemin-gifsicle options](https://github.com/imagemin/imagemin-gifsicle#options).|
+`svgo`|`object`|SVG compression options. See [imagemin-svgo options](https://github.com/imagemin/imagemin-svgo#options).|
 `basis`|`object`|Basis compression options. See [basis options below](#basis).|
 
 ### Modes

@@ -1,5 +1,10 @@
+import { extendDefaultPlugins } from 'svgo';
+
 import BasisOptions from '../types/BasisOptions';
-import ImgLoaderOptions, { ImgLoaderInternalOptions } from '../types/ImgLoaderOptions';
+import ImgLoaderOptions, {
+	ImgLoaderInternalOptions,
+	ImgLoaderQualityOptions,
+} from '../types/ImgLoaderOptions';
 
 
 function mergeBasisOptions(
@@ -55,6 +60,22 @@ function mergeThumbnailOptions(
 }
 
 
+function mergeSvgoOptions(
+	baseOption: ImgLoaderQualityOptions['svgo'],
+	overrideOption: ImgLoaderQualityOptions['svgo'],
+): ImgLoaderQualityOptions['svgo'] {
+	return {
+		...baseOption,
+		...overrideOption,
+		plugins: extendDefaultPlugins(
+			overrideOption.plugins
+				? overrideOption.plugins
+				: ( baseOption.plugins || []),
+		),
+	};
+}
+
+
 function mergeBooleanOptions(
 	baseOption: boolean,
 	overrideOption?: boolean,
@@ -96,6 +117,7 @@ export default function deriveExportOptions({
 							: baseQuality.pngquant.quality,
 				},
 				gifsicle: { ...baseQuality.gifsicle, ...( modeQuality.gifsicle || {}) },
+				svgo: mergeSvgoOptions( baseQuality.svgo, modeQuality.svgo || {} as unknown ),
 				basis: mergeBasisOptions( baseQuality.basis, modeQuality.basis || {}),
 			};
 		}
