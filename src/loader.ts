@@ -184,7 +184,7 @@ export default async function load( source: string ): Promise<string> {
 		});
 
 		this.emitFile( `${fileName}.jpg`, jpg.buffer );
-		exportFiles.push({ ext: fileExt, name: 'src' });
+		exportFiles.push({ ext: 'jpg', name: 'src' });
 	} else if ( fileExt === 'png' ) {
 		const png = await createPngFile({
 			inputHash,
@@ -195,7 +195,7 @@ export default async function load( source: string ): Promise<string> {
 		});
 
 		this.emitFile( `${fileName}.png`, png.buffer );
-		exportFiles.push({ ext: fileExt, name: 'src' });
+		exportFiles.push({ ext: 'png', name: 'src' });
 	} else if ( fileExt === 'gif' ) {
 		const gif = await createGifFile({
 			inputHash,
@@ -206,7 +206,7 @@ export default async function load( source: string ): Promise<string> {
 		});
 
 		this.emitFile( `${fileName}.gif`, gif.buffer );
-		exportFiles.push({ ext: fileExt, name: 'src' });
+		exportFiles.push({ ext: 'gif', name: 'src' });
 	} else if ( fileExt === 'svg' ) {
 		const svg = await createSvgFile({
 			inputHash,
@@ -217,7 +217,7 @@ export default async function load( source: string ): Promise<string> {
 		});
 
 		this.emitFile( `${fileName}.svg`, svg.buffer );
-		exportFiles.push({ ext: fileExt, name: 'src' });
+		exportFiles.push({ ext: 'svg', name: 'src' });
 	} else {
 		this.emitWarning(
 			new Error(
