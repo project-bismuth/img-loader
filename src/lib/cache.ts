@@ -67,7 +67,12 @@ export async function clearStaleFiles( usedFiles: string[]): Promise<void[]|void
 		) );
 
 		return Promise.all(
-			Array.from( staleFiles.values() ).map( file => fs.unlink( file ) ),
+			Array.from( staleFiles.values() ).map( async ( file ) => {
+				if ( await fileExists( file ) ) {
+					return fs.unlink( file );
+				}
+				return Promise.resolve();
+			}),
 		);
 	}
 
