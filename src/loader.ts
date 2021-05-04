@@ -10,11 +10,7 @@ import { ensureCacheReady } from './lib/cache';
 import createBasisFile from './lib/createBasisFile';
 import { isPowerOfTwo } from './lib/utils';
 import makePowerOfTwo from './lib/makePowerOfTwo';
-import createWebpFile from './lib/createWebpFile';
-import createJpegFile from './lib/createJpegFile';
-import createPngFile from './lib/createPngFile';
-import createGifFile from './lib/createGifFile';
-import createSvgFile from './lib/createSvgFile';
+import createImageFile from './lib/createImageFile';
 import generateDeclarations from './lib/generateDeclarations';
 import getDefaultQuality from './lib/getDefaultQuality';
 
@@ -159,12 +155,13 @@ export default async function load( source: string ): Promise<string> {
 	}
 
 	if ( exportOptions.emitWebp ) {
-		const webp = await createWebpFile({
+		const webp = await createImageFile({
 			inputHash,
-			buffer: inputBuffer,
-			options: exportOptions.webp,
-			reportName: relativePath,
 			resource,
+			type: 'webp',
+			buffer: inputBuffer,
+			options: exportOptions,
+			reportName: relativePath,
 		});
 
 		this.emitFile( `${fileName}.webp`, webp.buffer );
@@ -174,50 +171,20 @@ export default async function load( source: string ): Promise<string> {
 	if ( exportOptions.skipCompression ) {
 		this.emitFile( `${fileName}.${fileExt}`, inputBuffer );
 		exportFiles.push({ ext: fileExt, name: 'src' });
-	} else if ( fileExt === 'jpg' || fileExt === 'jpeg' ) {
-		const jpg = await createJpegFile({
+	} else if ( fileExt.match( /jpe?g|png|gif|svg/g ) ) {
+		const outExt = fileExt.replace( 'jpeg', 'jpg' );
+
+		const image = await createImageFile({
 			inputHash,
-			buffer: inputBuffer,
-			options: exportOptions.mozjpeg,
-			reportName: relativePath,
 			resource,
+			type: outExt,
+			buffer: inputBuffer,
+			options: exportOptions,
+			reportName: relativePath,
 		});
 
-		this.emitFile( `${fileName}.jpg`, jpg.buffer );
-		exportFiles.push({ ext: 'jpg', name: 'src' });
-	} else if ( fileExt === 'png' ) {
-		const png = await createPngFile({
-			inputHash,
-			buffer: inputBuffer,
-			options: exportOptions.pngquant,
-			reportName: relativePath,
-			resource,
-		});
-
-		this.emitFile( `${fileName}.png`, png.buffer );
-		exportFiles.push({ ext: 'png', name: 'src' });
-	} else if ( fileExt === 'gif' ) {
-		const gif = await createGifFile({
-			inputHash,
-			buffer: inputBuffer,
-			options: exportOptions.gifsicle,
-			reportName: relativePath,
-			resource,
-		});
-
-		this.emitFile( `${fileName}.gif`, gif.buffer );
-		exportFiles.push({ ext: 'gif', name: 'src' });
-	} else if ( fileExt === 'svg' ) {
-		const svg = await createSvgFile({
-			inputHash,
-			buffer: inputBuffer,
-			options: exportOptions.svgo,
-			reportName: relativePath,
-			resource,
-		});
-
-		this.emitFile( `${fileName}.svg`, svg.buffer );
-		exportFiles.push({ ext: 'svg', name: 'src' });
+		this.emitFile( `${fileName}.${outExt}`, image.buffer );
+		exportFiles.push({ ext: outExt, name: 'src' });
 	} else {
 		this.emitWarning(
 			new Error(
