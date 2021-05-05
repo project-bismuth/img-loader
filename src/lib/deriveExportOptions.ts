@@ -2,9 +2,12 @@ import { extendDefaultPlugins } from 'svgo';
 
 import BasisOptions from '../types/BasisOptions';
 import ImgLoaderOptions, {
+	DeepPartial,
 	ImgLoaderInternalOptions,
 	ImgLoaderQualityOptions,
+	ImgLoaderSizeOptions,
 } from '../types/ImgLoaderOptions';
+import defaultOptions from '../defaultOptions';
 
 
 function mergeBasisOptions(
@@ -84,6 +87,54 @@ function mergeBooleanOptions(
 	return baseOption;
 }
 
+function mergeSizeOptions(
+	baseOption: Record<string, ImgLoaderSizeOptions>,
+	overrideOption: Record<string, DeepPartial<ImgLoaderSizeOptions>> = {},
+): Record<string, ImgLoaderSizeOptions> {
+	const mergedOptions: Record<string, DeepPartial<ImgLoaderSizeOptions>> = {
+		...defaultOptions.sizes,
+		...baseOption,
+		...overrideOption,
+	};
+
+
+	Object.keys( mergedOptions ).forEach( ( sizeName ) => {
+		const baseSize = baseOption[sizeName] || {} as ImgLoaderSizeOptions;
+		const overrideSize = overrideOption[sizeName] || {};
+		const mergedSize = {
+			scale: 1,
+			...baseSize,
+			...overrideSize,
+		};
+
+		if ( 'max' in baseSize && 'max' in overrideSize ) {
+			mergedSize.max = {
+				...baseSize.max,
+				...overrideSize.max,
+			};
+		}
+		mergedSize.max = {
+			...defaultOptions.sizes.default.max,
+			...mergedSize.max,
+		};
+
+		if ( 'min' in baseSize && 'min' in overrideSize ) {
+			mergedSize.min = {
+				...baseSize.min,
+				...overrideSize.min,
+			};
+		}
+		mergedSize.min = {
+			...defaultOptions.sizes.default.min,
+			...mergedSize.min,
+		};
+
+		mergedOptions[sizeName] = mergedSize;
+	});
+
+	return mergedOptions as Record<string, ImgLoaderSizeOptions>;
+}
+
 
 interface DeriveQualityOptionsProps {
 	options: ImgLoaderOptions;
@@ -132,6 +183,8 @@ export default function deriveExportOptions({
 			forcePowerOfTwo: options.forcePowerOfTwo,
 			powerOfTwoStrategy: options.powerOfTwoStrategy,
 			skipCompression: options.skipCompression,
+			resizeKernel: options.resizeKernel,
+			sizes: mergeSizeOptions( options.sizes, {}),
 		};
 	}
 
@@ -146,8 +199,12 @@ export default function deriveExportOptions({
 			options.forcePowerOfTwo, modeOptions.forcePowerOfTwo,
 		),
 		powerOfTwoStrategy: modeOptions.powerOfTwoStrategy || options.powerOfTwoStrategy,
+		resizeKernel: modeOptions.resizeKernel || options.resizeKernel,
 		skipCompression: mergeBooleanOptions(
 			options.skipCompression, modeOptions.skipCompression,
+		),
+		sizes: mergeSizeOptions(
+			options.sizes, modeOptions.sizes,
 		),
 	};
 }

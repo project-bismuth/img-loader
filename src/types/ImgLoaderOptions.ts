@@ -1,7 +1,7 @@
 import type * as imageminMozjpeg from 'imagemin-mozjpeg';
 import type * as imageminGifsicle from 'imagemin-gifsicle';
 import type * as SVGO from 'svgo';
-import type { WebpOptions } from 'sharp';
+import type { ResizeOptions, WebpOptions } from 'sharp';
 import type { Options as PngOptions } from 'imagemin-pngquant';
 import type BasisOptions from './BasisOptions';
 
@@ -18,6 +18,18 @@ type ModeOptions = DeepPartial<Omit<ImgLoaderOptions, 'modes'>> & {
 	test: EmitConditionTest;
 };
 
+export interface ImgLoaderSizeOptions {
+	scale: number;
+	min: {
+		width: number;
+		height: number;
+	};
+	max: {
+		width: number;
+		height: number;
+	};
+}
+
 interface ImgLoaderExportOptions {
 	thumbnail: false | {
 		width: number;
@@ -29,6 +41,8 @@ interface ImgLoaderExportOptions {
 	skipCompression: boolean;
 	forcePowerOfTwo: boolean;
 	powerOfTwoStrategy: 'upscale' | 'downscale' | 'nearest' | 'area';
+	resizeKernel: ResizeOptions['kernel'];
+	sizes: Record<string, ImgLoaderSizeOptions>;
 }
 
 export interface ImgLoaderQualityOptions {

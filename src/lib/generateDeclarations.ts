@@ -13,11 +13,14 @@ const base = `
 
 type _BismuthImage = {
 	src: string;
-	prefix: string;
 	width: number;
 	height: number;
-	alpha: boolean;
 };
+
+type _WithMeta = {
+	prefix: string;
+	alpha: boolean;
+}
 
 type _WithWebp = {
 	webp: string;
@@ -37,9 +40,13 @@ type _WithThumbnail = {
 
 type BismuthImage =
 	_BismuthImage
+	& _WithMeta
 	& Partial<_WithWebp>
 	& Partial<_WithBasis>
-	& Partial<_WithThumbnail>;
+	& Partial<_WithThumbnail>
+	& {
+		sizes: Record<string, Partial<_BismuthImage & _WithWebp & _WithBasis>>;
+	};
 
 `;
 
@@ -70,11 +77,22 @@ function declaration({
 		quality: quality || getDefaultQuality( options, mode || 'default' ),
 	});
 
-	const types: string[] = ['_BismuthImage'];
+	const types: string[] = ['_BismuthImage', '_WithMeta'];
+	const sizeTypes: string[] = ['_BismuthImage'];
 
-	if ( exportOptions.emitWebp ) types.push( '_WithWebp' );
-	if ( exportOptions.emitBasis ) types.push( '_WithBasis' );
-	if ( exportOptions.thumbnail ) types.push( '_WithThumbnail' );
+	if ( exportOptions.thumbnail ) {
+		types.push( '_WithThumbnail' );
+	}
+	if ( exportOptions.emitWebp ) {
+		types.push( '_WithWebp' );
+		sizeTypes.push( '_WithWebp' );
+	}
+	if ( exportOptions.emitBasis ) {
+		types.push( '_WithBasis' );
+		sizeTypes.push( '_WithBasis' );
+	}
+
+	const sizes = Object.keys( exportOptions.sizes ).filter( s => s !== 'default' );
 
 	const params = [];
 	if ( mode ) params.push( `mode=${mode}` );
@@ -83,7 +101,13 @@ function declaration({
 
 	return `
 declare module '${ext}${params.length > 0 ? `?${params.join( '&' )}` : ''}' {
-	const e: ${types.join( ' & ' )};
+	const e: ${types.join( ' & ' )} & {
+		sizes: ${
+	sizes.length > 0
+		? `Record<'${sizes.join( "' | '" )}', ${sizeTypes.join( ' & ' )}>`
+		: '{}'
+};
+	};
 	export default e;
 }
 `;

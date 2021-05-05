@@ -15,6 +15,20 @@ const defaultOptions: ImgLoaderOptions = {
 	skipCompression: false,
 	forcePowerOfTwo: false,
 	powerOfTwoStrategy: 'area',
+	resizeKernel: 'lanczos3',
+	sizes: {
+		default: {
+			scale: 1,
+			max: {
+				width: Infinity,
+				height: Infinity,
+			},
+			min: {
+				width: 1,
+				height: 1,
+			},
+		},
+	},
 	defaultQualityLevel: 'medium',
 	qualityLevels: {
 		low: {
