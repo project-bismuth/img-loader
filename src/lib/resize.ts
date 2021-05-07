@@ -39,12 +39,15 @@ export default async function resize({
 		sizeOpts.min.width / originalWidth,
 		sizeOpts.min.height / originalHeight,
 	);
-	const scale = Math.max(
-		minimum,
-		Math.min(
-			sizeOpts.max.width / originalWidth,
-			sizeOpts.max.height / originalHeight,
-			sizeOpts.scale,
+	const scale = Math.min(
+		1, // ensure that there's no upscaling
+		Math.max(
+			minimum,
+			Math.min(
+				sizeOpts.max.width / originalWidth,
+				sizeOpts.max.height / originalHeight,
+				sizeOpts.scale,
+			),
 		),
 	);
 
