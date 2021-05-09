@@ -321,6 +321,7 @@ export default async function load( source: string ): Promise<string> {
 
 	exportMeta.push(
 		{ name: 'alpha', value: !sourceIsOpaque },
+		{ name: 'aspect', value: sourceWidth / sourceHeight },
 	);
 
 	if ( exportOptions.thumbnail ) {

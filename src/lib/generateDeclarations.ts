@@ -20,6 +20,7 @@ type _BismuthImage = {
 type _WithMeta = {
 	prefix: string;
 	alpha: boolean;
+	aspect: number;
 }
 
 type _WithWebp = {

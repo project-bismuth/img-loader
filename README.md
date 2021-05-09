@@ -66,6 +66,7 @@ By default, `myImg` will give you the following object:
 	prefix: 'your/webpack/public/path/',
 	width: 500, // source img pixel dimensions
 	height: 500,
+	aspect: 1,		// aspect ratio of source image
 	alpha: true,	// whether the image contains transparent areas
 	thumbnail: {
 		width: 4,
