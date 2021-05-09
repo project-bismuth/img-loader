@@ -1,5 +1,5 @@
 {
-	"name": "@bismuth/img-loader",
+	"name": "@bsmth/img-loader",
 	"version": "1.0.0",
 	"description": "Magical image loading.",
 	"main": "dist/cjs/index.js",

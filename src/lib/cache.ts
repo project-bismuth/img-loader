@@ -24,7 +24,7 @@ const cacheMap = new Map<string, string[]>();
 function ensureCachePrimed() {
 	if ( !isPrimed ) {
 		throw new Error(
-			'[@bismuth/img-loader]: The cache management plugin is not running.',
+			'[@bsmth/img-loader]: The cache management plugin is not running.',
 		);
 	}
 }

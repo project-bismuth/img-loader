@@ -4,15 +4,15 @@
 
 ## Motivations
 
-Dealing with images can be really messy, when you have to support multiple variants, formats and compression levels. `@bismuth/img-loader` attempts to solve this by doing all conversions, resizing and compressions automatically and on demand, when you import an image.
+Dealing with images can be really messy, when you have to support multiple variants, formats and compression levels. `@bsmth/img-loader` attempts to solve this by doing all conversions, resizing and compressions automatically and on demand, when you import an image.
 
 ## Installation
 
 ```
-yarn add --dev @bismuth/img-loader
+yarn add --dev @bsmth/img-loader
 ```
 ```
-npm i --save-dev @bismuth/img-loader
+npm i --save-dev @bsmth/img-loader
 ```
 
 ## Setup
@@ -21,7 +21,7 @@ You need to add the loader and its [cache management plugin](#caching) to your w
 
 
 ```typescript
-import { CachePlugin } from '@bismuth/img-loader';
+import { CachePlugin } from '@bsmth/img-loader';
 
 
 export default {
@@ -31,7 +31,7 @@ export default {
 			{
 				test: /\.(jpe?g|png|gif|svg)$/i,
 				use: [{
-					loader: '@bismuth/img-loader',
+					loader: '@bsmth/img-loader',
 					options: {
 						// ...
 					},
@@ -51,13 +51,13 @@ export default {
 ```
 ## Usage
 
-Inside your project you can now import images like so: 
+Inside your project you can now import images like so:
 
 ```typescript
 import myImg from './img.png';
 
 ```
-By default, `myImg` will give you the following object: 
+By default, `myImg` will give you the following object:
 
 ```typescript
 {
@@ -101,7 +101,7 @@ In this case you will get the same as above plus a `.basis` version:
 
 |Name|Type|Default|Description
 |---|---|---|---|
-|`name`|`string`|`'[name].[contenthash:6].[ext]'`|Specifies the output filename template.<br> Note, that `@bismuth/img-loader` may append an option hash for different renditions of the same input.
+|`name`|`string`|`'[name].[contenthash:6].[ext]'`|Specifies the output filename template.<br> Note, that `@bsmth/img-loader` may append an option hash for different renditions of the same input.
 |`outputPath`|`string`|`''`|Specifies where the output files will be placed.
 |`optionHashLength`|`number`|`4`|the length of the options-hash that may be appended to the output filename.
 |`generateDeclarations`|`boolean`|`false`|whether to emit typescript declarations for all image imports. See [Typescript](#typescript)
@@ -123,7 +123,7 @@ In this case you will get the same as above plus a `.basis` version:
 
 Quality levels give you granular control over how your images are compressed.
 
-A quality level may be set by adding a `?quality=` query parameter to the import statement. If none is set, the `defaultQualityLevel` is chosen. 
+A quality level may be set by adding a `?quality=` query parameter to the import statement. If none is set, the `defaultQualityLevel` is chosen.
 
 If you override the default config, you must specify at least one quality level.
 
@@ -162,13 +162,13 @@ Enable basis output and force power of 2 sizes for all images imported with `?mo
 
 ### Thumbnail
 
-`@bismuth/img-loader` can generate a tiny thumbnail that is synchronously available. 
+`@bsmth/img-loader` can generate a tiny thumbnail that is synchronously available.
 
 |Name|Type|Default|Description
 |---|---|---|---|
 `width`|`number`|`4`| thumbnail width in pixels
 `height`|`number`|`4`| thumbnail height in pixels
-`format`|`'raw' \| 'png'`|`'raw'`| specifies the thumbnail data encoding format.<br>`'raw'` gives you the raw RGBA data as a base64 encoded string, while `'png'` outputs a data URL that you can use directly, e.g. as an `<img>` `src` 
+`format`|`'raw' \| 'png'`|`'raw'`| specifies the thumbnail data encoding format.<br>`'raw'` gives you the raw RGBA data as a base64 encoded string, while `'png'` outputs a data URL that you can use directly, e.g. as an `<img>` `src`
 
 
 ### Default config
@@ -176,9 +176,9 @@ Enable basis output and force power of 2 sizes for all images imported with `?mo
 The default config can be found [here](https://github.com/johh/bismuth-img-loader/blob/master/src/defaultOptions.ts).
 
 ## Typescript
-`@bismuth/img-loader` can auto-generate declarations for your image imports, based on your config!
+`@bsmth/img-loader` can auto-generate declarations for your image imports, based on your config!
 
-By setting `generateDeclarations` to `true` in your config, `@bismuth/img-loader` will emit a file named `img-imports.d.ts` into your project root, containing declarations for every possible file extension, quality and mode combination. 
+By setting `generateDeclarations` to `true` in your config, `@bsmth/img-loader` will emit a file named `img-imports.d.ts` into your project root, containing declarations for every possible file extension, quality and mode combination.
 
 Naturally, this file can become quite large, depending on your config. To somewhat mitigate this, we assume that `mode` always comes before `quality` in any given query string. E.g. `*.png?mode=texture&quality=medium` is valid, `*.png?quality=medium&mode=texture` isn't.
 
@@ -196,7 +196,7 @@ This will also give you access to the `BismuthImage` type for your convenience.
 
 ## Caching
 
-`@bismuth/img-loader` will cache all processed images and intermediates on disk. To manage the cache (e.g. to auto clear stale files) it provides a `CachePlugin` which accepts the following options:
+`@bsmth/img-loader` will cache all processed images and intermediates on disk. To manage the cache (e.g. to auto clear stale files) it provides a `CachePlugin` which accepts the following options:
 
 
 |Name|Type|Default|Description
@@ -210,7 +210,7 @@ This will also give you access to the `BismuthImage` type for your convenience.
 
 ### Speed
 
-Image conversion / compression can be slow, especially when working with `.basis` files on higher quality settings. Since webpack has to wait for the compression to complete, hot reloading will be blocked during that time. 
+Image conversion / compression can be slow, especially when working with `.basis` files on higher quality settings. Since webpack has to wait for the compression to complete, hot reloading will be blocked during that time.
 
 If things get too slow, you can temporarily limit the amount of processing that needs to be done, by setting `skipCompression` and  `emitWebp`/`emitBasis` conditionally. If you choose to do so, remember to also keep unused cache files by setting `deleteUnusedFiles`, otherwise already generated renditions may be deleted. Also, the renditions need to be generated at some point – You may inadvertently force that workload on your CI, if you forget to generate them locally.
 
@@ -218,7 +218,7 @@ I'm looking into ways to decouple the compression tasks from webpack, but this i
 
 ### Working with git / CI
 
-Without an up to date cache, `@bismuth/img-loader` will create all necessary renditions on startup. This can lead to insanely long build- and startup times. To circumvent this, it may be desirable to push the entire cache directory to git LFS. While this is not ideal, all renditions will only be created once and reused on subsequent runs.
+Without an up to date cache, `@bsmth/img-loader` will create all necessary renditions on startup. This can lead to insanely long build- and startup times. To circumvent this, it may be desirable to push the entire cache directory to git LFS. While this is not ideal, all renditions will only be created once and reused on subsequent runs.
 
 ### Size
 
@@ -226,9 +226,9 @@ Don't forget to configure your CDN / server to deliver your `UASTC` `.basis` fil
 
 ## Basis
 
-`@bismuth/img-loader` ships with binaries of the [Basis Universal Supercompressed GPU Texture Codec](https://github.com/BinomialLLC/basis_universal) reference encoder.
+`@bsmth/img-loader` ships with binaries of the [Basis Universal Supercompressed GPU Texture Codec](https://github.com/BinomialLLC/basis_universal) reference encoder.
 
-Basis is a very complex topic in and of itself. `@bismuth/img-loader` exports a `BasisOptions` type to help you find an option combination that is valid.
+Basis is a very complex topic in and of itself. `@bsmth/img-loader` exports a `BasisOptions` type to help you find an option combination that is valid.
 Please refer to the [basis repo](https://github.com/BinomialLLC/basis_universal#readme) for info on the options.
 
 A `basis` options object can have the following props:
