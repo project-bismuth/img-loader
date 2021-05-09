@@ -72,8 +72,10 @@ export default async function load( source: string ): Promise<string> {
 	const {
 		width: sourceWidth,
 		height: sourceHeight,
-		hasAlpha: sourceHasAlpha,
 	} = await sharp( resourcePath ).metadata();
+	const {
+		isOpaque: sourceIsOpaque,
+	} = await sharp( resourcePath ).stats();
 
 
 	// TYPESCRIPT DECLARATIONS
@@ -318,7 +320,7 @@ export default async function load( source: string ): Promise<string> {
 	const exportMeta: { name: string; value: string | number | boolean }[] = [];
 
 	exportMeta.push(
-		{ name: 'alpha', value: sourceHasAlpha },
+		{ name: 'alpha', value: !sourceIsOpaque },
 	);
 
 	if ( exportOptions.thumbnail ) {
