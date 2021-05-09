@@ -1,18 +1,13 @@
 import sharp from 'sharp';
 
-import type {
-	ImgLoaderInternalOptions,
-	ImgLoaderSizeOptions,
-} from '../types/ImgLoaderOptions';
+import type { ImgLoaderInternalOptions } from '../types/ImgLoaderOptions';
 import { getFile, writeFile } from './cache';
 import { completeJob, trackJob } from './jobTracker';
-import { getPowerOfTwoSize } from './utils';
 
 
 interface ResizeProps {
 	inputHash: string;
 	inputBuffer: Buffer;
-	sizeOpts: ImgLoaderSizeOptions;
 	options: ImgLoaderInternalOptions;
 	width: number;
 	height: number;
@@ -21,9 +16,8 @@ interface ResizeProps {
 }
 
 export default async function resize({
-	width: originalWidth,
-	height: originalHeight,
-	sizeOpts,
+	width,
+	height,
 	options,
 	resource,
 	inputHash,
@@ -32,45 +26,7 @@ export default async function resize({
 }: ResizeProps ): Promise<{
 		buffer: Buffer;
 		path: string;
-		width: number;
-		height: number;
-	} | false> {
-	const minimum = Math.max(
-		sizeOpts.min.width / originalWidth,
-		sizeOpts.min.height / originalHeight,
-	);
-	const scale = Math.min(
-		1, // ensure that there's no upscaling
-		Math.max(
-			minimum,
-			Math.min(
-				sizeOpts.max.width / originalWidth,
-				sizeOpts.max.height / originalHeight,
-				sizeOpts.scale,
-			),
-		),
-	);
-
-	const [
-		width,
-		height,
-	] = options.forcePowerOfTwo
-		? getPowerOfTwoSize(
-			originalWidth * scale,
-			originalHeight * scale,
-			options.powerOfTwoStrategy,
-		)
-		: [
-			Math.round( originalWidth * scale ),
-			Math.round( originalHeight * scale ),
-		];
-
-
-	if ( width === originalWidth && height === originalHeight ) {
-		// no resizing necessary, use original
-		return false;
-	}
-
+	}> {
 	const cacheOpts = {
 		inputHash,
 		options: [width, height],
@@ -80,17 +36,11 @@ export default async function resize({
 
 	const cached = await getFile( cacheOpts );
 
-	if ( cached ) {
-		return {
-			...cached,
-			width,
-			height,
-		};
-	}
+	if ( cached ) return cached;
 
 	const job = trackJob({
 		reportName,
-		text: 'resizing',
+		text: options.forcePowerOfTwo ? 'resizing to POT' : 'downscaling',
 	});
 
 	const texture = sharp( inputBuffer );
@@ -113,7 +63,5 @@ export default async function resize({
 	return {
 		buffer,
 		path,
-		width,
-		height,
 	};
 }

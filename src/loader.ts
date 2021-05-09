@@ -5,13 +5,15 @@ import { promises as fs } from 'fs';
 import objHash from 'object-hash';
 
 import defaultOptions from './defaultOptions';
-import deriveQualityOptions from './lib/deriveExportOptions';
 import { ensureCacheReady } from './lib/cache';
+import generateDeclarations from './lib/generateDeclarations';
+import deriveExportOptions from './lib/deriveExportOptions';
+import deriveOutputFilename from './lib/deriveOutputFilename';
+import getDefaultQuality from './lib/getDefaultQuality';
 import createBasisFile from './lib/createBasisFile';
 import createImageFile from './lib/createImageFile';
-import generateDeclarations from './lib/generateDeclarations';
-import getDefaultQuality from './lib/getDefaultQuality';
 import resize from './lib/resize';
+import getSize from './lib/getSize';
 
 
 interface QueryParams {
@@ -22,19 +24,59 @@ interface QueryParams {
 let generatedDeclarations = false;
 
 export default async function load( source: string ): Promise<string> {
+	// signal webpack that the loader results are deterministic
 	if ( this.cacheable ) this.cacheable();
 
-	const { resource } = this;
+	// ensure that the file cache is ready
+	// and the cache plugin is running
+	await ensureCacheReady();
+
+
+	// WEBPACK SPECIFICS
+
+	const {
+		resource,
+		resourceQuery,
+		rootContext,
+		resourcePath,
+	} = this;
+
 	const options = { ...defaultOptions, ...( loaderUtils.getOptions( this ) || {}) };
-	const context = options.context || this.rootContext;
-	const params = this.resourceQuery
-		? loaderUtils.parseQuery( this.resourceQuery ) as QueryParams
+
+	const params = resourceQuery
+		? loaderUtils.parseQuery( resourceQuery ) as QueryParams
 		: {};
 
-	const relativePath = this.resourcePath
-		.replace( this.rootContext, '' )
+
+	// IMPORT AND EXPORT FILENAME DERIVATION
+
+	const relativePath = resourcePath
+		.replace( rootContext, '' )
 		.split( path.sep )
 		.join( path.posix.sep );
+
+	const {
+		fileExt,
+		fileNameBase,
+	} = deriveOutputFilename({
+		options,
+		source,
+		loaderContext: this,
+	});
+
+
+	// SOURCE FILE CONTENT AND META
+
+	const sourceFileBuffer = await fs.readFile( resourcePath );
+	const sourceFileHash = loaderUtils.getHashDigest( sourceFileBuffer, 'md4', 'hex', 32 );
+	const {
+		width: sourceWidth,
+		height: sourceHeight,
+		hasAlpha: sourceHasAlpha,
+	} = await sharp( resourcePath ).metadata();
+
+
+	// TYPESCRIPT DECLARATIONS
 
 	if (
 		!generatedDeclarations
@@ -45,6 +87,8 @@ export default async function load( source: string ): Promise<string> {
 		generatedDeclarations = true;
 	}
 
+
+	// MODE DETECTION
 
 	let mode = 'default';
 
@@ -57,11 +101,13 @@ export default async function load( source: string ): Promise<string> {
 	} else {
 		Object.entries( options.modes ).forEach( ([modeId, { test }]) => {
 			if ( typeof test === 'function' ) {
-				if ( test( relativePath, this.resourcePath ) ) mode = modeId;
+				if ( test( relativePath, resourcePath ) ) mode = modeId;
 			}
 		});
 	}
 
+
+	// QUALITY LEVEL DETECTION
 
 	let quality = getDefaultQuality( options, mode );
 
@@ -74,213 +120,252 @@ export default async function load( source: string ): Promise<string> {
 	}
 
 
-	const exportOptions = deriveQualityOptions({
+	// FINAL EXPORT OPTIONS
+
+	const exportOptions = deriveExportOptions({
 		options,
 		mode,
 		quality,
 	});
 
 
-	const interpolatedName = loaderUtils.interpolateName( this, options.name, {
-		context,
-		content: source,
-	});
-	const outputPath = ( 'outputPath' in options )
-		? path.join( options.outputPath, interpolatedName )
-		: interpolatedName;
+	// RESOLUTIONS DERIVATION
 
+	// every resolution only needs to be generated once
+	// storing them as strings in a Set ensures that.
+	// using strings here is a dumb way of making the Set work as expected
+	const resolutionIds = new Set<string>();
 
-	const temp = outputPath.split( '.' );
-	const fileExt = temp.pop().toLowerCase();
+	// map the sizeId to the corresponding resolution identifier
+	const resolutionMap = new Map<string, string>();
+
+	// gifs and svgs cannot be resized
 	const isResizable = fileExt.match( /jpe?g|png|webp/ );
 
-	await ensureCacheReady();
+	// derive final resolutions for the desired sizes
+	Object.entries( exportOptions.sizes ).forEach( ([sizeId, sizeOpts]) => {
+		const resIdentifier = isResizable
+			// calculate the new resolution if the source is resizable
+			? getSize({
+				sizeOpts,
+				width: sourceWidth,
+				height: sourceHeight,
+				options: exportOptions,
+			}).toString()
+			// otherwise use the source one
+			: `${sourceWidth},${sourceHeight}`;
 
-	const sourceFileStats = await sharp( this.resourcePath ).metadata();
-	const sourceFileBuffer = await fs.readFile( this.resourcePath );
-	const sourceFileHash = loaderUtils.getHashDigest( sourceFileBuffer, 'md4', 'hex', 32 );
+		// map the sizeId to the resolution identifier
+		resolutionMap.set(
+			sizeId,
+			resIdentifier,
+		);
+
+		// and add the resolution identifier to the set of
+		// resolutions that need to be generated
+		resolutionIds.add( resIdentifier );
+	});
 
 
-	const exportSizes: Record<string, {
+	// RESOLUTIONS GENERATION
+
+	const resolutions = new Map<string, {
 		width: number;
 		height: number;
 		fileName: string;
+		varName: string;
 		files: { ext: string; name: string }[];
-	}> = {};
+	}>();
 
-	await Promise.all(
-		Object.entries( exportOptions.sizes )
-			.map( async ([sizeId, sizeOpts]) => {
-				const fileName = `${
-					temp.join( '.' )
-				}-${
-					objHash({
-						...exportOptions,
-						// override the size list with the relevant size settings
-						// to only hash options used for the current rendition
-						sizes: sizeOpts,
-					}).substr( 0, options.optionHashLength )
-				}`;
+	// generate files for all resolutions
+	await Promise.all( Array.from( resolutionIds ).map( async ( resIdentifier, i ) => {
+		// resolutions are stored as strings inside the resolutionIds Set (see above)
+		const [width, height] = resIdentifier.split( ',' ).map( x => parseInt( x, 10 ) );
 
-				let inputBuffer = sourceFileBuffer;
-				let inputPath = this.resourcePath;
-				let { width, height } = sourceFileStats;
+		// the export filename consists of the user specified filename
+		// and an option hash to differentiate between renditions
+		const fileName = `${fileNameBase}-${
+			objHash({
+				...exportOptions,
+				// override the size list with the final resolution
+				// to only hash options used for the current rendition
+				sizes: resIdentifier,
+			}).substr( 0, options.optionHashLength )
+		}`;
+
+		let inputBuffer = sourceFileBuffer;
+		let inputPath = resourcePath;
+
+		if ( width !== sourceWidth || height !== sourceHeight ) {
+			// input needs to be resized.
+			const resized = await resize({
+				width,
+				height,
+				inputBuffer,
+				resource,
+				inputHash: sourceFileHash,
+				reportName: relativePath,
+				options: exportOptions,
+			});
+
+			// use the resized version as input
+			inputBuffer = resized.buffer;
+			inputPath = resized.path;
+		}
+
+		const files = [];
+
+		// common options for all create functions
+		const createOptions = {
+			resource,
+			inputPath,
+			options: exportOptions,
+			reportName: relativePath,
+			buffer: inputBuffer,
+			inputHash: loaderUtils.getHashDigest( inputBuffer, 'md4', 'hex', 32 ),
+		};
 
 
-				if ( isResizable ) {
-					const resized = await resize({
-						width,
-						height,
-						inputHash: sourceFileHash,
-						inputBuffer: sourceFileBuffer,
-						reportName: relativePath,
-						options: exportOptions,
-						sizeOpts,
-						resource,
-					});
+		// SOURCE FILE COMPRESSION
 
-					if ( resized ) {
-						inputBuffer = resized.buffer;
-						inputPath = resized.path;
-						width = resized.width;
-						height = resized.height;
-					} else if ( sizeId !== 'default' ) {
-						// no resize needed,
-						// use the original
-						return;
-					}
-				} else if ( sizeId !== 'default' ) {
-					// svgs and gifs won't get properly resized,
-					// use the original
-					return;
-				}
+		if ( exportOptions.skipCompression ) {
+			// input should not be compressed,
+			// emit file unaltered.
 
-				const files = [];
-				const inputHash = loaderUtils.getHashDigest( inputBuffer, 'md4', 'hex', 32 );
+			this.emitFile( `${fileName}.${fileExt}`, inputBuffer );
+			files.push({ ext: fileExt, name: 'src' });
+		} else if (
+			fileExt.match( /jpe?g|png|gif|svg/g )
+		) {
+			// input can be compressed with imagemin
 
-				if ( exportOptions.emitBasis ) {
-					if ( fileExt.match( /png|jpe?g/ ) ) {
-						const basis = await createBasisFile({
-							inputHash,
-							inputPath,
-							options: exportOptions.basis,
-							reportName: relativePath,
-							resource,
-						});
+			// normalize jpg file extension
+			const outExt = fileExt.replace( 'jpeg', 'jpg' );
 
-						this.emitFile( `${fileName}.basis`, basis.buffer );
-						files.push({ ext: 'basis', name: 'basis' });
-					} else {
-						this.emitWarning(
-							new Error(
-								`Basis compression is not available for ${
-									fileExt
-								} files. Only jpg and png are supported.`,
-							),
-						);
-					}
-				}
+			const image = await createImageFile({
+				...createOptions,
+				type: outExt,
+			});
 
-				if ( exportOptions.emitWebp ) {
-					const webp = await createImageFile({
-						inputHash,
-						resource,
-						type: 'webp',
-						buffer: inputBuffer,
-						options: exportOptions,
-						reportName: relativePath,
-					});
+			this.emitFile( `${fileName}.${outExt}`, image.buffer );
+			files.push({ ext: outExt, name: 'src' });
+		} else {
+			// input is in a format that can currently not be compressed,
+			// emit file unaltered.
 
-					this.emitFile( `${fileName}.webp`, webp.buffer );
-					files.push({ ext: 'webp', name: 'webp' });
-				}
+			this.emitWarning(
+				new Error(
+					`${
+						fileExt
+					} files are currently not supported, the file will not be compressed.`,
+				),
+			);
 
-				if ( exportOptions.skipCompression ) {
-					this.emitFile( `${fileName}.${fileExt}`, inputBuffer );
-					files.push({ ext: fileExt, name: 'src' });
-				} else if ( fileExt.match( /jpe?g|png|gif|svg/g ) ) {
-					const outExt = fileExt.replace( 'jpeg', 'jpg' );
+			this.emitFile( `${fileName}.${fileExt}`, inputBuffer );
+			files.push({ ext: fileExt, name: 'src' });
+		}
 
-					const image = await createImageFile({
-						inputHash,
-						resource,
-						type: outExt,
-						buffer: inputBuffer,
-						options: exportOptions,
-						reportName: relativePath,
-					});
 
-					this.emitFile( `${fileName}.${outExt}`, image.buffer );
-					files.push({ ext: outExt, name: 'src' });
-				} else {
-					this.emitWarning(
-						new Error(
-							`${
-								fileExt
-							} files are currently not supported, the file will not be compressed.`,
-						),
-					);
+		// ADDITIONAL EXPORTS
 
-					this.emitFile( `${fileName}.${fileExt}`, inputBuffer );
-					files.push({ ext: fileExt, name: 'src' });
-				}
+		if ( exportOptions.emitBasis ) {
+			if ( fileExt.match( /png|jpe?g/ ) ) {
+				const basis = await createBasisFile({
+					...createOptions,
+					options: exportOptions.basis,
+				});
 
-				exportSizes[sizeId] = {
-					width,
-					height,
-					fileName,
-					files,
-				};
-			}),
-	);
+				this.emitFile( `${fileName}.basis`, basis.buffer );
+				files.push({ ext: 'basis', name: 'basis' });
+			} else {
+				this.emitWarning(
+					new Error(
+						`Basis compression is not available for ${
+							fileExt
+						} files. Only jpg and png are supported.`,
+					),
+				);
+			}
+		}
 
+		if ( exportOptions.emitWebp ) {
+			const webp = await createImageFile({
+				...createOptions,
+				type: 'webp',
+			});
+
+			this.emitFile( `${fileName}.webp`, webp.buffer );
+			files.push({ ext: 'webp', name: 'webp' });
+		}
+
+
+		// map exports to resolution identifier
+		resolutions.set(
+			resIdentifier,
+			{
+				width,
+				height,
+				files,
+				fileName,
+				varName: `p${i}`,
+			},
+		);
+	}) );
+
+
+	// EXPORT META
 
 	const exportMeta: { name: string; value: string | number | boolean }[] = [];
 
 	exportMeta.push(
-		{ name: 'alpha', value: sourceFileStats.hasAlpha },
+		{ name: 'alpha', value: sourceHasAlpha },
 	);
 
 	if ( exportOptions.thumbnail ) {
+		const { width, height, format } = exportOptions.thumbnail;
+
 		const thumb = sharp( sourceFileBuffer ).resize(
-			exportOptions.thumbnail.width,
-			exportOptions.thumbnail.height,
+			width,
+			height,
 			{ fit: 'fill' },
 		);
+
+		const data = format === 'png'
+			// encode as png
+			? `data:image/png;base64,${
+				( await thumb.png().toBuffer() ).toString( 'base64' )
+			}`
+			// or raw RGBA data
+			: ( await thumb.ensureAlpha().raw().toBuffer() ).toString( 'base64' );
 
 		exportMeta.push({
 			name: 'thumbnail',
 			value: JSON.stringify({
-				data: exportOptions.thumbnail.format === 'png'
-					? `data:image/png;base64,${
-						( await thumb.png().toBuffer() ).toString( 'base64' )
-					}`
-					: ( await thumb.ensureAlpha().raw().toBuffer() ).toString( 'base64' ),
-				width: exportOptions.thumbnail.width,
-				height: exportOptions.thumbnail.height,
+				data,
+				width,
+				height,
 			}),
 		});
 	}
 
 
-	const exportPaths = new Map(
-		Object.values( exportSizes ).map( ({ fileName }, i ) => [fileName, `p${i}`]),
-	);
+	// EXPORT
 
+	// export the path and file name of each resolution as a variable
 	let paths = '';
-	exportPaths.forEach( ( varName, fileName ) => {
+	resolutions.forEach( ({ varName, fileName }) => {
 		paths += `const ${varName} = __webpack_public_path__ + ${JSON.stringify( fileName )};\n`;
 	});
 
 
-	const sizeToExportString = ( key: string ) => {
+	const sizeToExportString = ( sizeId: string ) => {
 		const {
-			files, fileName, width, height,
-		} = exportSizes[key];
+			files, varName, width, height,
+		} = resolutions.get( resolutionMap.get( sizeId ) );
 		return (
 			files
 				.map( ({ ext, name }) => (
-					`${name}: ${exportPaths.get( fileName )} + '.${ext}'`
+					`${name}: ${varName} + '.${ext}'`
 				) )
 				.concat([
 					`width: ${width}`,
@@ -289,6 +374,7 @@ export default async function load( source: string ): Promise<string> {
 				.join( ',' )
 		);
 	};
+
 
 	return `
 ${
@@ -313,17 +399,16 @@ ${
 ${
 	// export all remaining sizes
 	Object.keys( exportOptions.sizes )
-		.filter( key => key !== 'default' )
-		.map( ( key ) => (
-			// if there are no files for the current size,
-			// reuse the default ones
-			`${key}: {
-				${sizeToExportString( key in exportSizes ? key : 'default' )}
+		.filter( sizeId => sizeId !== 'default' )
+		.map( ( sizeId ) => (
+
+			`${sizeId}: {
+				${sizeToExportString( sizeId )}
 			}`
 
 		) ).join( ',' )
 }
 	}
 };
-`;
+	`;
 }
