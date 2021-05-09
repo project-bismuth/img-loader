@@ -33,7 +33,7 @@ const defaultOptions: ImgLoaderOptions = {
 	qualityLevels: {
 		low: {
 			webp: {
-				quality: 50,
+				quality: 60,
 				alphaQuality: 40,
 				reductionEffort: 5,
 			},
@@ -84,7 +84,7 @@ const defaultOptions: ImgLoaderOptions = {
 		},
 		medium: {
 			webp: {
-				quality: 75,
+				quality: 87,
 				alphaQuality: 75,
 				reductionEffort: 6,
 			},
