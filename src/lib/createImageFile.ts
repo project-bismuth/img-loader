@@ -54,12 +54,24 @@ export default async function createImageFile({
 		text: `compressing .${type}`,
 	});
 
+	let inBuffer = buffer;
 	let outBuffer;
 
+	if ( type === 'jpg' && ( await sharp( inBuffer ).metadata() ).format !== 'jpeg' ) {
+		// inBuffer is a PNG buffer from the resizing step,
+		// but the desired output is JPG.
+		// Convert to a JPG buffer, so that it is
+		// run through mozjpeg in the next step.
+		inBuffer = await sharp( inBuffer ).jpeg({
+			quality: 100,
+			chromaSubsampling: '4:4:4',
+		}).toBuffer();
+	}
+
 	if ( type === 'webp' ) {
-		outBuffer = await sharp( buffer ).webp( options.webp ).toBuffer();
+		outBuffer = await sharp( inBuffer ).webp( options.webp ).toBuffer();
 	} else {
-		outBuffer = await imagemin.buffer( buffer, {
+		outBuffer = await imagemin.buffer( inBuffer, {
 			plugins: [
 				imageminMozjpeg( options.mozjpeg ),
 				imageminPngquant( options.pngquant ),
