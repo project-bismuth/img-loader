@@ -125,10 +125,10 @@ In this case you will get the same as above plus a `.basis` version:
 `emitWebp`|`boolean`|`true`| whether a WebP version should also be created.
 `emitBasis`|`boolean`|`false`|  whether a basis version should also be created.
 `thumbnail`|`false \| object`|[see below](#thumbnail)|either a config object ([see below](#thumbnail)) or `false` to disable.
-`qualityLevels`|`Record<string, QualityLevel>`|[see default config](https://github.com/johh/bismuth-img-loader/blob/master/src/defaultOptions.ts)|an object of quality levels. See below.
+`qualityLevels`|`Record<string, QualityLevel>`|[see default config](https://github.com/project-bismuth/img-loader/blob/master/src/defaultOptions.ts)|an object of quality levels. See below.
 `defaultQualityLevel`|`string`|`'medium'`| the quality level used if none is explicitly set
-`modes`|`Record<string, Mode>`|[see default config](https://github.com/johh/bismuth-img-loader/blob/master/src/defaultOptions.ts)|an object of modes. [See below.](#Modes)
-`sizes`|`Record<string, Size>`|[see default config](https://github.com/johh/bismuth-img-loader/blob/master/src/defaultOptions.ts)|an object of sizes. [See below](#Sizes).
+`modes`|`Record<string, Mode>`|[see default config](https://github.com/project-bismuth/img-loader/blob/master/src/defaultOptions.ts)|an object of modes. [See below.](#Modes)
+`sizes`|`Record<string, Size>`|[see default config](https://github.com/project-bismuth/img-loader/blob/master/src/defaultOptions.ts)|an object of sizes. [See below](#Sizes).
 `resizeKernel`|`'nearest' \| 'cubic' \| 'mitchell' \| 'lanczos2' \| 'lanczos3'`|`'lanczos3'`|the interpolation kernel used for downscaling
 
 ---
@@ -284,7 +284,7 @@ Importing that image then gives you:
 
 ### Default config
 
-The default config can be found [here](https://github.com/johh/bismuth-img-loader/blob/master/src/defaultOptions.ts).
+The default config can be found [here](https://github.com/project-bismuth/img-loader/blob/master/src/defaultOptions.ts).
 
 ---
 
@@ -358,7 +358,7 @@ A `basis` options object can have the following props:
 |---|---|:-:|---|
 `forceAlpha`|`boolean`||`-force_alpha`
 `mipmaps`|`boolean`||`-mipmaps`
-`mipFilter`|`string`||`-mip_filter filter`, defaults to `'lanczos3'`.<br>See [`BasisOptions.ts`](https://github.com/johh/bismuth-img-loader/blob/master/src/types/BasisOptions.ts) for all possible values.
+`mipFilter`|`string`||`-mip_filter filter`, defaults to `'lanczos3'`.<br>See [`BasisOptions.ts`](https://github.com/project-bismuth/img-loader/blob/master/src/types/BasisOptions.ts) for all possible values.
 `linear`|`boolean`||`-linear`, also sets `-mip_linear`
 `yFlip`|`boolean`||`-y_flip`
 `normalMap`|`boolean`||`-normal_map`
