@@ -7,5 +7,7 @@ tslint.json
 .nvmrc
 .eslintignore
 .eslintrc.js
+.prettierignore
+.github/
 yarn.lock
 yarn-error.log

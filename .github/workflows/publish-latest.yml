@@ -21,4 +21,4 @@ jobs:
           token: ${{ secrets.NPM_AUTH_TOKEN }}
           tag: 'latest'
           access: 'public'
-          dry-run: true
+          dry-run: false
