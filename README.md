@@ -163,7 +163,7 @@ They may be triggered by adding a `?mode=` query parameter to the import stateme
 Enable basis output and force power of 2 sizes for all images imported with `?mode=example` or with `'example'` in their path:
 
 ```typescript
-// webpack config
+// webpack loader options
 {
 	// ...
 	modes: {
@@ -204,7 +204,7 @@ You can override the default behaviour (root `src`/`webp`/`basis` exports) by sp
 Cap the size of all images at `4000px`×`3000px` and export an additional "mobile" size at half res, not downscaling below `300px`×`300px` but at least to `2000px`×`2000px`:
 
 ```typescript
-// webpack config
+// webpack loader options
 {
 	// ...
 	sizes: {
