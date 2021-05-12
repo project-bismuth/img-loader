@@ -4,7 +4,9 @@
 
 ## Motivations
 
-Dealing with images can be really messy, when you have to support multiple variants, formats and compression levels. `@bsmth/img-loader` attempts to solve this by doing all conversions, resizing and compressions automatically and on demand, when you import an image.
+Dealing with images can be really messy, when you have to support multiple resolutions, formats and compression levels. `@bsmth/img-loader` attempts to solve this by doing all conversions, resizing and compressions automatically and on demand, when you import an image.
+
+---
 
 ## Installation
 
@@ -14,6 +16,8 @@ yarn add --dev @bsmth/img-loader
 ```
 npm i --save-dev @bsmth/img-loader
 ```
+
+---
 
 ## Setup
 
@@ -47,8 +51,10 @@ export default {
 	],
 };
 
-
 ```
+
+---
+
 ## Usage
 
 Inside your project you can now import images like so:
@@ -64,15 +70,16 @@ By default, `myImg` will give you the following object:
 	src: 'path/to/compressed/img.png',
 	webp: 'path/to/webp/img.webp',
 	prefix: 'your/webpack/public/path/',
-	width: 500, // source img pixel dimensions
+	width: 500,
 	height: 500,
-	aspect: 1,		// aspect ratio of source image
+	aspect: 1,	// aspect ratio of source image
 	alpha: true,	// whether the image contains transparent areas
 	thumbnail: {
 		width: 4,
 		height: 4,
 		data: 'base64 encoded raw RGBA data',
 	},
+	sizes: {},
 }
 
 ```
@@ -95,6 +102,7 @@ In this case you will get the same as above plus a `.basis` version:
 
 ```
 
+---
 
 ## Config
 
@@ -106,19 +114,24 @@ In this case you will get the same as above plus a `.basis` version:
 |`outputPath`|`string`|`''`|Specifies where the output files will be placed.
 |`optionHashLength`|`number`|`4`|the length of the options-hash that may be appended to the output filename.
 |`generateDeclarations`|`boolean`|`false`|whether to emit typescript declarations for all image imports. See [Typescript](#typescript)
-|`skipCompression`|`boolean`|`false`| disables image compression/optimisation for PNG and JPEG outputs
+
 
 ### Image options
 |Name|Type|Default|Description
 |---|---|---|---|
-`forcePowerOfTwo`|`boolean`|`false`|whether to force a power of 2 resolution. Note that `width` and `height` in the imported object will still contain the source images resolution.
+`skipCompression`|`boolean`|`false`| disables image compression/optimisation for PNG, JPEG, SVG and GIF outputs
+`forcePowerOfTwo`|`boolean`|`false`|whether to force a power of 2 resolution.
 `powerOfTwoStrategy`|`'upscale' \| 'downscale' \| 'nearest' \| 'area'`|`'area'`|how the power of 2 resolution is calculated. `upscale`, `downscale` and `nearest` should be self-descriptive. `area` rounds to the nearest power of 2 while attempting to match the source images area.
 `emitWebp`|`boolean`|`true`| whether a WebP version should also be created.
 `emitBasis`|`boolean`|`false`|  whether a basis version should also be created.
 `thumbnail`|`false \| object`|[see below](#thumbnail)|either a config object ([see below](#thumbnail)) or `false` to disable.
 `qualityLevels`|`Record<string, QualityLevel>`|[see default config](https://github.com/johh/bismuth-img-loader/blob/master/src/defaultOptions.ts)|an object of quality levels. See below.
 `defaultQualityLevel`|`string`|`'medium'`| the quality level used if none is explicitly set
-`modes`|`Record<string, Mode>`|[see default config](https://github.com/johh/bismuth-img-loader/blob/master/src/defaultOptions.ts)|an object of modes. See below.
+`modes`|`Record<string, Mode>`|[see default config](https://github.com/johh/bismuth-img-loader/blob/master/src/defaultOptions.ts)|an object of modes. [See below.](#Modes)
+`sizes`|`Record<string, Size>`|[see default config](https://github.com/johh/bismuth-img-loader/blob/master/src/defaultOptions.ts)|an object of sizes. [See below](#Sizes).
+`resizeKernel`|`'nearest' \| 'cubic' \| 'mitchell' \| 'lanczos2' \| 'lanczos3'`|`'lanczos3'`|the interpolation kernel used for downscaling
+
+---
 
 ### Quality levels
 
@@ -139,8 +152,10 @@ Each quality level object accepts the following properties:
 `svgo`|`object`|SVG compression options. See [imagemin-svgo options](https://github.com/imagemin/imagemin-svgo#options).|
 `basis`|`object`|Basis compression options. See [basis options below](#basis).|
 
+---
+
 ### Modes
-Modes let you selectively override **all** image options and quality levels. (the specified overrides will be merged into their respective targets)
+Modes let you selectively override **all** image options (including sizes) and quality levels. (the specified overrides will be merged into their respective targets)
 
 They may be triggered by adding a `?mode=` query parameter to the import statement, or by a test function.
 
@@ -148,6 +163,7 @@ They may be triggered by adding a `?mode=` query parameter to the import stateme
 Enable basis output and force power of 2 sizes for all images imported with `?mode=example` or with `'example'` in their path:
 
 ```typescript
+// webpack config
 {
 	// ...
 	modes: {
@@ -161,9 +177,102 @@ Enable basis output and force power of 2 sizes for all images imported with `?mo
 
 ```
 
+---
+
+### Sizes
+
+Sizes let you generate multiple named resolutions of the same source image.
+
+Configuring a size adds a corresponding set of additional exports to the `sizes` object of the image.
+
+Each size object accepts the any combination of the following properties:
+
+|Name|Type|Default|Description
+|---|---|---|---|
+`scale`|`number` < 1|`1`| Dimension scalar. The dimensions of the original image are multiplied by this. 
+`max`||`{ width: Infinity, height: Infinity }`| Dimension cap in pixels. All images will be downscaled to **at least** fit this resolution
+`min`| |`{ width: 1, height: 1 }`| Minimum pixel dimensions an image may have after downscaling. Images originally smaller than this will not be upscaled.
+
+Note that `forcePowerOfTwo` takes precedence over this, so depending on your `powerOfTwoStrategy` setting, you may get files that are larger or smaller than expected.
+
+Scaling of GIFs and SVGs is not supported currently. The exports are still created, but they point to the full size image.
+
+You can override the default behaviour (root `src`/`webp`/`basis` exports) by specifying a `default` size.
+
+#### Example
+
+Cap the size of all images at `4000px`×`3000px` and export an additional "mobile" size at half res, not downscaling below `300px`×`300px` but at least to `2000px`×`2000px`:
+
+```typescript
+// webpack config
+{
+	// ...
+	sizes: {
+		default: {
+			max: {
+				width: 4000,
+				height: 3000,
+			}
+		},
+		mobile: {
+			scale: .5,
+			min: {
+				width: 300,
+				height: 300,
+			},
+			max: {
+				width: 2000,
+				height: 2000,
+			},
+		},
+	},
+}
+
+```
+
+Given a `5000px`×`5000px` input image, output resolutions are the following: 
+
+- `default`: `3000px`×`3000px`
+- `mobile`: `2000px`×`2000px`
+
+While a `500px`×`500px` input image yields:
+
+- `default`: `500px`×`500px`
+- `mobile`: `300px`×`300px`
+
+Importing that image then gives you:
+
+```typescript
+{
+	src: 'path/to/compressed/img.png',
+	webp: 'path/to/webp/img.webp',
+	prefix: 'your/webpack/public/path/',
+	width: 500,
+	height: 500,
+	aspect: 1,
+	alpha: true,
+	thumbnail: {
+		width: 4,
+		height: 4,
+		data: 'base64 encoded raw RGBA data',
+	},
+	sizes: {
+		mobile: {
+			width: 300,
+			height: 300,
+			src: 'path/to/mobile/img.png',
+			webp: 'path/to/mobile/img.webp',
+		},
+	},
+}
+
+```
+
+---
+
 ### Thumbnail
 
-`@bsmth/img-loader` can generate a tiny thumbnail that is synchronously available.
+`@bsmth/img-loader` can generate a tiny thumbnail that is available synchronously.
 
 |Name|Type|Default|Description
 |---|---|---|---|
@@ -171,10 +280,13 @@ Enable basis output and force power of 2 sizes for all images imported with `?mo
 `height`|`number`|`4`| thumbnail height in pixels
 `format`|`'raw' \| 'png'`|`'raw'`| specifies the thumbnail data encoding format.<br>`'raw'` gives you the raw RGBA data as a base64 encoded string, while `'png'` outputs a data URL that you can use directly, e.g. as an `<img>` `src`
 
+---
 
 ### Default config
 
 The default config can be found [here](https://github.com/johh/bismuth-img-loader/blob/master/src/defaultOptions.ts).
+
+---
 
 ## Typescript
 `@bsmth/img-loader` can auto-generate declarations for your image imports, based on your config!
@@ -182,6 +294,8 @@ The default config can be found [here](https://github.com/johh/bismuth-img-loade
 By setting `generateDeclarations` to `true` in your config, `@bsmth/img-loader` will emit a file named `img-imports.d.ts` into your project root, containing declarations for every possible file extension, quality and mode combination.
 
 Naturally, this file can become quite large, depending on your config. To somewhat mitigate this, we assume that `mode` always comes before `quality` in any given query string. E.g. `*.png?mode=texture&quality=medium` is valid, `*.png?quality=medium&mode=texture` isn't.
+
+Note that only the `mode` set via a query parameter can be detected by Typescript. You may see inaccurate types for files where `mode` is set via a `test` function.
 
 To include the declarations in your TS setup, add this to your `tsconfig.json`:
 
@@ -195,6 +309,8 @@ To include the declarations in your TS setup, add this to your `tsconfig.json`:
 ```
 This will also give you access to the `BismuthImage` type for your convenience.
 
+---
+
 ## Caching
 
 `@bsmth/img-loader` will cache all processed images and intermediates on disk. To manage the cache (e.g. to auto clear stale files) it provides a `CachePlugin` which accepts the following options:
@@ -206,6 +322,8 @@ This will also give you access to the `BismuthImage` type for your convenience.
 |`cacheDir`|`string`|`'.img-loader-cache'`|specifies the cache directory
 |`deleteUnusedFiles`|`boolean`|`true`|whether to auto delete unused cache files
 |`aggressive`|`boolean`|`true`|toggles aggressive cache cleaning.<br>If true, the plugin will check for and delete stale files on every change.<br>This may be undesirable, for example when testing/comparing different quality renditions, since the assets will be rebuilt every time.<br>Disabling this option instructs the plugin to only check and clean once on startup.
+
+---
 
 ## Pitfalls/Shortcomings
 
@@ -224,6 +342,8 @@ Without an up to date cache, `@bsmth/img-loader` will create all necessary rendi
 ### Size
 
 Don't forget to configure your CDN / server to deliver your `UASTC` `.basis` files with `gzip` or `brotli` compression! Their disk size is 4 bytes per pixel, so a 1024x1024 texture is 4MB uncompressed. This may also baloon your git LFS size, so be aware of that when using `UASTC` textures.
+
+---
 
 ## Basis
 
@@ -254,14 +374,18 @@ A `basis` options object can have the following props:
 `uastcLevel`|`number`|`UASTC`|`-uastc_level number`
 `uastcRdoQ`|`number`|`UASTC`|`-uastc_rdo_q number`
 
+---
+
 ## To-dos
-- [ ] support for generating multiple sizes
-- [ ] webpack config validation
-- [ ] async generation (not blocking webpack while images are being compressed)
 - [x] better cache cleaning
+- [x] support for generating multiple sizes
+- [ ] webpack config validation
+- [ ] better documentation
+- [ ] async generation (not blocking webpack while images are being compressed)
 - [ ] examples
 - [ ] tests
 
+---
 
 ## License
 
