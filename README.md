@@ -389,4 +389,6 @@ A `basis` options object can have the following props:
 
 ## License
 
-© 2021 the bismuth project authors, licensed under MIT.
+© 2021 the project bismuth authors, licensed under MIT.
+
+This project uses the[ Basis Universal format and reference encoder](https://github.com/BinomialLLC/basis_universal) which is © 2021 Binomial LLC, licensed under Apache 2.0.
