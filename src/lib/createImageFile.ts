@@ -5,9 +5,12 @@ import imageminSvgo from 'imagemin-svgo';
 import imageminGifsicle from 'imagemin-gifsicle';
 
 import sharp from 'sharp';
+import {
+	read as cacheRead,
+	write as cacheWrite,
+} from '@bsmth/loader-cache';
+import { trackJob } from '@bsmth/loader-progress';
 import type { ImgLoaderQualityOptions } from '../types/ImgLoaderOptions';
-import { getFile, writeFile } from './cache';
-import { completeJob, trackJob } from './jobTracker';
 
 
 interface CreateImageFileProps {
@@ -41,7 +44,7 @@ export default async function createImageFile({
 	}> {
 	const relevantOptions = options[compressorForType[type]];
 
-	const cached = await getFile({
+	const cached = await cacheRead({
 		options: relevantOptions,
 		inputHash,
 		resource,
@@ -49,7 +52,7 @@ export default async function createImageFile({
 
 	if ( cached ) return cached;
 
-	const job = trackJob({
+	const completeJob = trackJob({
 		reportName,
 		text: `compressing .${type}`,
 	});
@@ -81,14 +84,14 @@ export default async function createImageFile({
 		});
 	}
 
-	const path = await writeFile({
+	const path = await cacheWrite({
 		buffer: outBuffer,
 		options: relevantOptions,
 		inputHash,
 		resource,
 	});
 
-	completeJob( job );
+	completeJob();
 
 	return {
 		buffer: outBuffer,

@@ -1,8 +1,11 @@
 import sharp from 'sharp';
 
+import {
+	read as cacheRead,
+	write as cacheWrite,
+} from '@bsmth/loader-cache';
+import { trackJob } from '@bsmth/loader-progress';
 import type { ImgLoaderInternalOptions } from '../types/ImgLoaderOptions';
-import { getFile, writeFile } from './cache';
-import { completeJob, trackJob } from './jobTracker';
 
 
 interface ResizeProps {
@@ -34,11 +37,11 @@ export default async function resize({
 		resource,
 	};
 
-	const cached = await getFile( cacheOpts );
+	const cached = await cacheRead( cacheOpts );
 
 	if ( cached ) return cached;
 
-	const job = trackJob({
+	const completeJob = trackJob({
 		reportName,
 		text: options.forcePowerOfTwo ? 'resizing to POT' : 'downscaling',
 	});
@@ -53,12 +56,12 @@ export default async function resize({
 	});
 
 	const buffer = await texture.png().toBuffer();
-	const path = await writeFile({
+	const path = await cacheWrite({
 		buffer,
 		...cacheOpts,
 	});
 
-	completeJob( job );
+	completeJob();
 
 	return {
 		buffer,
