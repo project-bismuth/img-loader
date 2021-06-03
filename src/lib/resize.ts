@@ -4,8 +4,8 @@ import {
 	read as cacheRead,
 	write as cacheWrite,
 } from '@bsmth/loader-cache';
+import { trackJob } from '@bsmth/loader-progress';
 import type { ImgLoaderInternalOptions } from '../types/ImgLoaderOptions';
-import { completeJob, trackJob } from './jobTracker';
 
 
 interface ResizeProps {
@@ -41,7 +41,7 @@ export default async function resize({
 
 	if ( cached ) return cached;
 
-	const job = trackJob({
+	const completeJob = trackJob({
 		reportName,
 		text: options.forcePowerOfTwo ? 'resizing to POT' : 'downscaling',
 	});
@@ -61,7 +61,7 @@ export default async function resize({
 		...cacheOpts,
 	});
 
-	completeJob( job );
+	completeJob();
 
 	return {
 		buffer,

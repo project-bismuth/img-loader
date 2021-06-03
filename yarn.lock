@@ -894,6 +894,13 @@
   version "0.4.0"
   resolved "https://registry.yarnpkg.com/@eslint/eslintrc/-/eslintrc-0.4.0.tgz#99cc0a0584d72f1df38b900fb062ba995f395547"
   integrity sha512-2ZPCc+uNbjV5ERJr+aKSPRwZgKd2z11x0EgLvb1PURmUrn9QNRXFqje0Ldq454PfAVyaJYyrDvvIKSFP4NnBog==
+"@bsmth/loader-progress@^1.0.0":
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/@bsmth/loader-progress/-/loader-progress-1.0.0.tgz#bba93adc9b3aa9333930b71f1bfe7d29ecc5234e"
+  integrity sha512-8lmNHLuK/HZdIUjSWzUSKMtRAez+HspqG3CXqlxkFS52ud6XdNbEavUGsEu/SRvITYfnNt8wmkMmuUOYvJPKag==
+  dependencies:
+    chalk "^4.1.1"
+    ora "^5.4.0"
   dependencies:
     ajv "^6.12.4"
     debug "^4.1.1"

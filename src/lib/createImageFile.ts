@@ -9,8 +9,8 @@ import {
 	read as cacheRead,
 	write as cacheWrite,
 } from '@bsmth/loader-cache';
+import { trackJob } from '@bsmth/loader-progress';
 import type { ImgLoaderQualityOptions } from '../types/ImgLoaderOptions';
-import { completeJob, trackJob } from './jobTracker';
 
 
 interface CreateImageFileProps {
@@ -52,7 +52,7 @@ export default async function createImageFile({
 
 	if ( cached ) return cached;
 
-	const job = trackJob({
+	const completeJob = trackJob({
 		reportName,
 		text: `compressing .${type}`,
 	});
@@ -84,14 +84,14 @@ export default async function createImageFile({
 		});
 	}
 
-	const path = await writeFile({
+	const path = await cacheWrite({
 		buffer: outBuffer,
 		options: relevantOptions,
 		inputHash,
 		resource,
 	});
 
-	completeJob( job );
+	completeJob();
 
 	return {
 		buffer: outBuffer,

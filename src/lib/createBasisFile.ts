@@ -7,8 +7,8 @@ import {
 	read as cacheRead,
 	getFilename,
 } from '@bsmth/loader-cache';
+import { trackJob } from '@bsmth/loader-progress';
 import type BasisOptions from '../types/BasisOptions';
-import { trackJob, completeJob } from './jobTracker';
 
 const asyncExec = promisify( exec );
 
@@ -115,7 +115,7 @@ export default async function createBasisFile({
 		}
 	}
 
-	const job = trackJob({
+	const completeJob = trackJob({
 		reportName,
 		text: 'compressing .basis',
 	});
@@ -126,7 +126,7 @@ export default async function createBasisFile({
 	if ( stderr ) {
 		throw new Error( `BASIS COMPRESSION FAILED: ${stderr}` );
 	} else {
-		completeJob( job );
+		completeJob();
 	}
 
 
