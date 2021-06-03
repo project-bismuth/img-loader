@@ -4,8 +4,8 @@ import path from 'path';
 import { promises as fs } from 'fs';
 import objHash from 'object-hash';
 
+import { ensureCacheReady } from '@bsmth/loader-cache';
 import defaultOptions from './defaultOptions';
-import { ensureCacheReady } from './lib/cache';
 import generateDeclarations from './lib/generateDeclarations';
 import deriveExportOptions from './lib/deriveExportOptions';
 import deriveOutputFilename from './lib/deriveOutputFilename';

@@ -5,8 +5,11 @@ import imageminSvgo from 'imagemin-svgo';
 import imageminGifsicle from 'imagemin-gifsicle';
 
 import sharp from 'sharp';
+import {
+	read as cacheRead,
+	write as cacheWrite,
+} from '@bsmth/loader-cache';
 import type { ImgLoaderQualityOptions } from '../types/ImgLoaderOptions';
-import { getFile, writeFile } from './cache';
 import { completeJob, trackJob } from './jobTracker';
 
 
@@ -41,7 +44,7 @@ export default async function createImageFile({
 	}> {
 	const relevantOptions = options[compressorForType[type]];
 
-	const cached = await getFile({
+	const cached = await cacheRead({
 		options: relevantOptions,
 		inputHash,
 		resource,

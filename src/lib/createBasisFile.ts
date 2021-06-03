@@ -3,8 +3,11 @@ import { promises as fs } from 'fs';
 import { promisify } from 'util';
 import { exec } from 'child_process';
 
+import {
+	read as cacheRead,
+	getFilename,
+} from '@bsmth/loader-cache';
 import type BasisOptions from '../types/BasisOptions';
-import { getFile, getFilename } from './cache';
 import { trackJob, completeJob } from './jobTracker';
 
 const asyncExec = promisify( exec );
@@ -41,7 +44,7 @@ export default async function createBasisFile({
 		buffer: Buffer;
 		path: string;
 	}> {
-	const cached = await getFile({ inputHash, options, resource });
+	const cached = await cacheRead({ inputHash, options, resource });
 
 	if ( cached ) {
 		return cached;

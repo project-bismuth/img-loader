@@ -1,7 +1,10 @@
 import sharp from 'sharp';
 
+import {
+	read as cacheRead,
+	write as cacheWrite,
+} from '@bsmth/loader-cache';
 import type { ImgLoaderInternalOptions } from '../types/ImgLoaderOptions';
-import { getFile, writeFile } from './cache';
 import { completeJob, trackJob } from './jobTracker';
 
 
@@ -34,7 +37,7 @@ export default async function resize({
 		resource,
 	};
 
-	const cached = await getFile( cacheOpts );
+	const cached = await cacheRead( cacheOpts );
 
 	if ( cached ) return cached;
 
@@ -53,7 +56,7 @@ export default async function resize({
 	});
 
 	const buffer = await texture.png().toBuffer();
-	const path = await writeFile({
+	const path = await cacheWrite({
 		buffer,
 		...cacheOpts,
 	});
