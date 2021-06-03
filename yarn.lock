@@ -933,6 +933,14 @@
     "@babel/helper-validator-identifier" "^7.14.0"
     to-fast-properties "^2.0.0"
 
+"@bsmth/loader-cache@^1.0.1":
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/@bsmth/loader-cache/-/loader-cache-1.0.1.tgz#6bd75f012dc524a695d87108b65838ff3c66a8cd"
+  integrity sha512-2zrCff7phxNQeJ7v6NDJ+SGCU9kWb0P3dFtqoXq3FGOq4hQPmlYZmexhoLSEKQy3dop93tQehiD74KfN0UzErw==
+  dependencies:
+    chalk "^4.1.1"
+    object-hash "^2.2.0"
+
 "@bsmth/loader-progress@^1.0.0":
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/@bsmth/loader-progress/-/loader-progress-1.0.0.tgz#bba93adc9b3aa9333930b71f1bfe7d29ecc5234e"
