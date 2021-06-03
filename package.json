@@ -1,6 +1,6 @@
 {
 	"name": "@bsmth/img-loader",
-	"version": "1.1.0",
+	"version": "1.1.1",
 	"description": "Magical image loading for webpack.",
 	"main": "dist/cjs/index.js",
 	"module": "dist/esm/index.js",
@@ -26,7 +26,6 @@
 		"@babel/plugin-proposal-object-rest-spread": "^7.14.4",
 		"@babel/preset-env": "^7.14.4",
 		"@babel/preset-typescript": "^7.10.4",
-		"@bsmth/loader-cache": "^1.0.1",
 		"@types/imagemin-gifsicle": "^7.0.0",
 		"@types/imagemin-mozjpeg": "^8.0.0",
 		"@types/imagemin-svgo": "^9.0.0",
@@ -53,6 +52,7 @@
 		"webpack": "^5.38.1"
 	},
 	"dependencies": {
+		"@bsmth/loader-cache": "^1.0.1",
 		"@bsmth/loader-progress": "^1.0.0",
 		"chalk": "^4.1.1",
 		"imagemin": "7",
@@ -65,9 +65,6 @@
 		"ora": "^5.4.0",
 		"sharp": "^0.28.3",
 		"svgo": "2"
-	},
-	"peerDependencies": {
-		"@bsmth/loader-cache": "^1.0.1"
 	},
 	"husky": {
 		"hooks": {
