@@ -8,7 +8,7 @@ interface DeriveFilenameProps {
 	options: ImgLoaderOptions;
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	loaderContext: any;
-	source: string;
+	source: Buffer;
 }
 
 export default function deriveOutputFilename({

@@ -1,7 +1,6 @@
 import loaderUtils from 'loader-utils';
 import sharp from 'sharp';
 import path from 'path';
-import { promises as fs } from 'fs';
 import objHash from 'object-hash';
 
 import { ensureCacheReady } from '@bsmth/loader-cache';
@@ -23,7 +22,7 @@ interface QueryParams {
 
 let generatedDeclarations = false;
 
-export default async function load( source: string ): Promise<string> {
+export default async function load( source: Buffer ): Promise<string> {
 	// signal webpack that the loader results are deterministic
 	if ( this.cacheable ) this.cacheable();
 
@@ -67,7 +66,7 @@ export default async function load( source: string ): Promise<string> {
 
 	// SOURCE FILE CONTENT AND META
 
-	const sourceFileBuffer = await fs.readFile( resourcePath );
+	const sourceFileBuffer = source;
 	const sourceFileHash = loaderUtils.getHashDigest( sourceFileBuffer, 'md4', 'hex', 32 );
 	const {
 		width: sourceWidth,
