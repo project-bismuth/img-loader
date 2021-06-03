@@ -26,6 +26,7 @@
 		"@babel/plugin-proposal-object-rest-spread": "^7.14.4",
 		"@babel/preset-env": "^7.14.4",
 		"@babel/preset-typescript": "^7.10.4",
+		"@bsmth/loader-cache": "^1.0.1",
 		"@types/imagemin-gifsicle": "^7.0.0",
 		"@types/imagemin-mozjpeg": "^8.0.0",
 		"@types/imagemin-svgo": "^9.0.0",
