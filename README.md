@@ -11,21 +11,21 @@ Dealing with images can be really messy, when you have to support multiple resol
 ## Installation
 
 ```
-yarn add --dev @bsmth/img-loader
+yarn add --dev @bsmth/img-loader @bsmth/loader-cache
 ```
 ```
-npm i --save-dev @bsmth/img-loader
+npm i --save-dev @bsmth/img-loader @bsmth/loader-cache
 ```
 
 ---
 
 ## Setup
 
-You need to add the loader and its [cache management plugin](#caching) to your webpack config.
+You'll need to add the loader and its [cache management plugin](#caching) to your webpack config.
 
 
 ```typescript
-import { CachePlugin } from '@bsmth/img-loader';
+import { CachePlugin } from "@bsmth/loader-cache";
 
 
 export default {
@@ -187,7 +187,7 @@ Configuring a size adds a corresponding set of additional exports to the `sizes`
 
 Each size object accepts the any combination of the following properties:
 
-|Name|Type|Default|Description
+|Name|Type|Default|Description|
 |---|---|---|---|
 `scale`|`number` < 1|`1`| Dimension scalar. The dimensions of the original image are multiplied by this. 
 `max`||`{ width: Infinity, height: Infinity }`| Dimension cap in pixels. All images will be downscaled to **at least** fit this resolution
@@ -313,15 +313,7 @@ This will also give you access to the `BismuthImage` type for your convenience.
 
 ## Caching
 
-`@bsmth/img-loader` will cache all processed images and intermediates on disk. To manage the cache (e.g. to auto clear stale files) it provides a `CachePlugin` which accepts the following options:
-
-
-|Name|Type|Default|Description
-|---|---|---|---|
-|`enabled`|`boolean`|`true`| an easy way to disable the plugin conditionally
-|`cacheDir`|`string`|`'.img-loader-cache'`|specifies the cache directory
-|`deleteUnusedFiles`|`boolean`|`true`|whether to auto delete unused cache files
-|`aggressive`|`boolean`|`true`|toggles aggressive cache cleaning.<br>If true, the plugin will check for and delete stale files on every change.<br>This may be undesirable, for example when testing/comparing different quality renditions, since the assets will be rebuilt every time.<br>Disabling this option instructs the plugin to only check and clean once on startup.
+`@bsmth/img-loader` will cache all processed images and intermediates on disk. This is handled by the `CachePlugin` exported by `@bsmth/loader-cache`, which [accepts some options](https://github.com/project-bismuth/loader-cache#options).
 
 ---
 
@@ -337,7 +329,7 @@ I'm looking into ways to decouple the compression tasks from webpack, but this i
 
 ### Working with git / CI
 
-Without an up to date cache, `@bsmth/img-loader` will create all necessary renditions on startup. This can lead to insanely long build- and startup times. To circumvent this, it may be desirable to push the entire cache directory to git LFS. While this is not ideal, all renditions will only be created once and reused on subsequent runs.
+Without an up to date cache, `@bsmth/img-loader` will create all necessary renditions on startup. This can lead to insanely long build- and startup times. To circumvent this, it may be desirable to push the entire cache directory (`.bsmth-loader-cache` by default) to git LFS. While this is not ideal, all renditions will only be created once and reused on subsequent runs.
 
 ### Size
 
