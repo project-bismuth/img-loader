@@ -6,6 +6,8 @@
 
 Dealing with images can be really messy, when you have to support multiple resolutions, formats and compression levels. `@bsmth/img-loader` attempts to solve this by doing all conversions, resizing and compressions automatically and on demand, when you import an image.
 
+https://user-images.githubusercontent.com/5791070/120940715-e92e3d00-c71e-11eb-9ab9-a94815fce5fc.mp4
+
 ---
 
 ## Installation
