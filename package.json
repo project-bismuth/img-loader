@@ -64,7 +64,7 @@
 		"object-hash": "^2.2.0",
 		"ora": "^5.4.0",
 		"sharp": "^0.28.3",
-		"svgo": "2"
+		"svgo": "2 <2.4"
 	},
 	"husky": {
 		"hooks": {
