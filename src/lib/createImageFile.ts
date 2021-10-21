@@ -27,6 +27,7 @@ const compressorForType: Record<string, keyof ImgLoaderQualityOptions> = {
 	jpg: 'mozjpeg',
 	png: 'pngquant',
 	webp: 'webp',
+	avif: 'avif',
 	gif: 'gifsicle',
 	svg: 'svgo',
 };
@@ -73,6 +74,8 @@ export default async function createImageFile({
 
 	if ( type === 'webp' ) {
 		outBuffer = await sharp( inBuffer ).webp( options.webp ).toBuffer();
+	} else if ( type === 'avif' ) {
+		outBuffer = await sharp( inBuffer ).avif( options.avif ).toBuffer();
 	} else {
 		outBuffer = await imagemin.buffer( inBuffer, {
 			plugins: [

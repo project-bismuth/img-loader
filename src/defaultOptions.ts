@@ -11,6 +11,7 @@ const defaultOptions: ImgLoaderOptions = {
 		format: 'raw',
 	},
 	emitWebp: true,
+	emitAvif: false,
 	emitBasis: false,
 	skipCompression: false,
 	forcePowerOfTwo: false,
@@ -36,6 +37,12 @@ const defaultOptions: ImgLoaderOptions = {
 				quality: 60,
 				alphaQuality: 40,
 				reductionEffort: 5,
+			},
+			avif: {
+				quality: 40,
+				lossless: false,
+				speed: 5,
+				chromaSubsampling: '4:2:0',
 			},
 			pngquant: {
 				quality: [.3, .6],
@@ -88,6 +95,12 @@ const defaultOptions: ImgLoaderOptions = {
 				alphaQuality: 75,
 				reductionEffort: 6,
 			},
+			avif: {
+				quality: 70,
+				lossless: false,
+				speed: 5,
+				chromaSubsampling: '4:4:4',
+			},
 			pngquant: {
 				quality: [.7, .9],
 				strip: true,
@@ -135,6 +148,12 @@ const defaultOptions: ImgLoaderOptions = {
 			webp: {
 				nearLossless: true,
 				reductionEffort: 6,
+			},
+			avif: {
+				quality: 90,
+				lossless: false,
+				speed: 4,
+				chromaSubsampling: '4:4:4',
 			},
 			pngquant: {
 				quality: [.85, 1],
