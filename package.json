@@ -1,6 +1,6 @@
 {
 	"name": "@bsmth/img-loader",
-	"version": "1.1.2",
+	"version": "1.2.0",
 	"description": "Magical image loading for webpack.",
 	"main": "dist/cjs/index.js",
 	"module": "dist/esm/index.js",
@@ -30,7 +30,7 @@
 		"@types/imagemin-mozjpeg": "^8.0.0",
 		"@types/imagemin-svgo": "^9.0.0",
 		"@types/loader-utils": "^2.0.2",
-		"@types/sharp": "^0.28.3",
+		"@types/sharp": "^0.29.2",
 		"@types/svgo": "^2.3.0",
 		"@typescript-eslint/eslint-plugin": "^4.26.0",
 		"@typescript-eslint/parser": "^4.26.0",
@@ -62,7 +62,7 @@
 		"imagemin-svgo": "^9.0.0",
 		"loader-utils": "^2.0.0",
 		"object-hash": "^2.2.0",
-		"sharp": "^0.28.3",
+		"sharp": "^0.29.1",
 		"svgo": "2 <2.4"
 	},
 	"husky": {

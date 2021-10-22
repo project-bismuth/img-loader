@@ -156,6 +156,7 @@ export default function deriveExportOptions({
 		if ( modeQuality ) {
 			finalQuality = {
 				webp: { ...baseQuality.webp, ...( modeQuality.webp || {}) },
+				avif: { ...baseQuality.avif, ...( modeQuality.avif || {}) },
 				mozjpeg: { ...baseQuality.mozjpeg, ...( modeQuality.mozjpeg || {}) },
 				pngquant: {
 					...baseQuality.pngquant,
@@ -178,8 +179,9 @@ export default function deriveExportOptions({
 		return {
 			...finalQuality,
 			thumbnail: options.thumbnail,
-			emitBasis: options.emitBasis,
 			emitWebp: options.emitWebp,
+			emitAvif: options.emitAvif,
+			emitBasis: options.emitBasis,
 			forcePowerOfTwo: options.forcePowerOfTwo,
 			powerOfTwoStrategy: options.powerOfTwoStrategy,
 			skipCompression: options.skipCompression,
@@ -193,8 +195,9 @@ export default function deriveExportOptions({
 	return {
 		...finalQuality,
 		thumbnail: mergeThumbnailOptions( options.thumbnail, modeOptions.thumbnail ),
-		emitBasis: mergeBooleanOptions( options.emitBasis, modeOptions.emitBasis ),
 		emitWebp: mergeBooleanOptions( options.emitWebp, modeOptions.emitWebp ),
+		emitAvif: mergeBooleanOptions( options.emitAvif, modeOptions.emitAvif ),
+		emitBasis: mergeBooleanOptions( options.emitBasis, modeOptions.emitBasis ),
 		forcePowerOfTwo: mergeBooleanOptions(
 			options.forcePowerOfTwo, modeOptions.forcePowerOfTwo,
 		),

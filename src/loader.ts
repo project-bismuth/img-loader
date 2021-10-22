@@ -299,6 +299,16 @@ export default async function load( source: Buffer ): Promise<string> {
 			files.push({ ext: 'webp', name: 'webp' });
 		}
 
+		if ( exportOptions.emitAvif ) {
+			const webp = await createImageFile({
+				...createOptions,
+				type: 'avif',
+			});
+
+			this.emitFile( `${fileName}.avif`, webp.buffer );
+			files.push({ ext: 'avif', name: 'avif' });
+		}
+
 
 		// map exports to resolution identifier
 		resolutions.set(

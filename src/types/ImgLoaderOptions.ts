@@ -1,7 +1,7 @@
 import type * as imageminMozjpeg from 'imagemin-mozjpeg';
 import type * as imageminGifsicle from 'imagemin-gifsicle';
 import type * as SVGO from 'svgo';
-import type { ResizeOptions, WebpOptions } from 'sharp';
+import type { ResizeOptions, WebpOptions, AvifOptions } from 'sharp';
 import type { Options as PngOptions } from 'imagemin-pngquant';
 import type BasisOptions from './BasisOptions';
 
@@ -37,6 +37,7 @@ interface ImgLoaderExportOptions {
 		format: 'raw' | 'png';
 	};
 	emitWebp: boolean;
+	emitAvif: boolean;
 	emitBasis: boolean;
 	skipCompression: boolean;
 	forcePowerOfTwo: boolean;
@@ -47,6 +48,7 @@ interface ImgLoaderExportOptions {
 
 export interface ImgLoaderQualityOptions {
 	webp: WebpOptions;
+	avif: AvifOptions;
 	pngquant: PngOptions;
 	mozjpeg: imageminMozjpeg.Options;
 	basis: BasisOptions;
