@@ -62,7 +62,7 @@
 		"imagemin-svgo": "^9.0.0",
 		"loader-utils": "^2.0.0",
 		"object-hash": "^2.2.0",
-		"sharp": "^0.29.1",
+		"sharp": "^0.30.5",
 		"svgo": "2 <2.4"
 	},
 	"husky": {
